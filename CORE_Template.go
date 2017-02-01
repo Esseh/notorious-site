@@ -33,6 +33,7 @@ func init() {
 		"inc":           Inc,
 		"addCtx":        addCtx,
 		"getDate":       getDate,
+		"toInt":		 toInt,
 		// "isOwner":       isOwner,
 		"parse": parse,
 	} // Load up all templates.
@@ -104,6 +105,10 @@ func FindTemplate(name string) (ret template.HTML, err error) {
 	err = tpl.ExecuteTemplate(buf, (name), nil)
 	ret = template.HTML(buf.String())
 	return
+}
+
+func toInt(id retrievable.IntID) int64 {
+	return int64(id)
 }
 
 type contextData struct {

@@ -71,8 +71,8 @@ func NOTES_GET_Reference_TestBed(res http.ResponseWriter, req *http.Request, par
 		[]Note{
 			Note{1,true,0},		
 			Note{2,false,0},		
-			Note{3,true,0},		
-			Note{4,false,0},		
+			Note{2,true,0},		
+			Note{2,false,0},		
 		},
 	}
 	// test with existing user
