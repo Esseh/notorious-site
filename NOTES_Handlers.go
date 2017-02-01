@@ -17,6 +17,8 @@ const (
 	PATH_NOTES_View     = "/view/:ID"
 	PATH_NOTES_Editor   = "/edit/:ID"
 	PATH_NOTES_Edit     = "/edit/"
+	
+	PATH_NOTES_Reference_Test = "/references/test/:USER"
 )
 
 func INIT_NOTES_HANDLERS(r *httprouter.Router) {
@@ -27,6 +29,60 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.POST(PATH_NOTES_Edit, NOTES_POST_Editor)
 	r.GET(PATH_NOTES_document, NOTES_GET_DOCUMENT)   // TODO: remove prototype
 	r.POST(PATH_NOTES_document, NOTES_POST_DOCUMENT) // TODO: remove prototype
+	
+	// Test For Matthew
+	r.GET(PATH_NOTES_Reference_Test, NOTES_GET_Reference_TestBed)
+}
+
+func NOTES_GET_Reference_TestBed(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	/*
+		HeaderData
+			ShowLogin    bool
+			ShowRegister bool
+			Ctx          context.Context
+			User         *User
+			CurrentPath  string
+	*/
+	/*
+		User
+			First, Last       string
+			Email             string
+			Avatar            bool `datastore:",noindex"`
+			Bio               string
+			retrievable.IntID `datastore:"-" json:"-"`
+	*/
+	/*
+		Note
+			OwnerID int64 // owner of the note, can set permissions
+			//Collab []int64			// any people collabing, stretch goal
+			Protected bool  // if true then it is not publically editable.
+			ContentID int64 // Reference to the content of the note.
+
+		Content
+			Title, Content string // Content can be raw html or markdown	
+	*/
+	obj := struct {
+		HeaderData
+		MainNote		 Note
+		ReferenceNotes []Note
+	}{
+		*MakeHeader(res, req, false, true),
+		Note{5,false,0},
+		[]Note{
+			Note{1,true,0},		
+			Note{2,false,0},		
+			Note{3,true,0},		
+			Note{4,false,0},		
+		},
+	}
+	// test with existing user
+	if(params.ByName("ID") == "1"){
+		obj.HeaderData.User = &User{"Bob","Dole","mail@mail.com",false,"Just a man looking for love.",retrievable.IntID(1)}
+	} else {
+	// test without existing user
+		obj.HeaderData.User = &User{}
+	}
+	ServeTemplateWithParams(res, "note-test", obj)
 }
 
 func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
