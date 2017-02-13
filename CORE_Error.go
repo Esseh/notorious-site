@@ -68,10 +68,14 @@ func ErrorPage(ctx Context, ErrorTitle string, e error, errCode int) bool {
 ////  True: Parent should cease execution, error has been found.
 ////  False: No Error, Parent may ignore this function.
 /// Usage: Use in POST calls accessed from a GET of the same handle.
-func BackWithError(res http.ResponseWriter, req *http.Request, err error, errorString string) bool {
+func BackWithError(ctx Context, err error, errorString string) bool {
 	if err != nil {
-		path := strings.Replace(req.URL.Path, "%2f", "/", -1)
-		http.Redirect(res, req, path+"?"+url.QueryEscape("ErrorResponse")+"="+url.QueryEscape(errorString), http.StatusSeeOther)
+		path := strings.Replace(ctx.req.URL.Path, "%2f", "/", -1)
+		path += "?"+url.QueryEscape("ErrorResponse")+"="+url.QueryEscape(errorString)
+		if ctx.req.FormValue("redirect") != "" {
+			path += "&"+url.QueryEscape("redirect")+"="+ctx.req.FormValue("redirect")		
+		}
+		http.Redirect(ctx.res, ctx.req, path, http.StatusSeeOther)
 		return true
 	}
 	return false
