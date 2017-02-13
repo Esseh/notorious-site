@@ -28,6 +28,8 @@ func (ctx Context)AssertLoggedInFailed() bool {
 	return false
 }
 
+func (ctx Context)Redirect(uri string){ http.Redirect(ctx.res, ctx.req, uri, http.StatusSeeOther) }
+
 func NewContext(res http.ResponseWriter, req *http.Request) Context{
 	user, err := GetUserFromSession(req)
 	ctx := Context { 
@@ -40,7 +42,7 @@ func NewContext(res http.ResponseWriter, req *http.Request) Context{
 	return ctx
 }
 
-func GetExistingNote(id string, ctx context.Context)(*Note,*Content,error){
+func GetExistingNote(ctx Context,id string)(*Note,*Content,error){
 	RetrievedNote := &Note{}
 	RetrievedContent := &Content{}
 	NoteKey, err := strconv.ParseInt(id, 10, 64)
@@ -51,16 +53,16 @@ func GetExistingNote(id string, ctx context.Context)(*Note,*Content,error){
 	return RetrievedNote,RetrievedContent,err
 }
 
-func VerifyNotePermission(res http.ResponseWriter, req *http.Request, user *User, note *Note) bool {
+func VerifyNotePermission(ctx Context, note *Note) bool {
 	redirect := strconv.FormatInt(note.OwnerID, 10)
-	if note.OwnerID != int64(user.IntID) && note.Protected {
-		http.Redirect(res, req, "/view/"+redirect, http.StatusSeeOther)
+	if note.OwnerID != int64(ctx.user.IntID) && note.Protected {
+		ctx.Redirect("/view/"+redirect)
 		return false
 	}
 	return true
 }
 
-func CreateNewNote(ctx context.Context,NewContent Content,NewNote Note) (*datastore.Key,*datastore.Key,error) {
+func CreateNewNote(ctx Context,NewContent Content,NewNote Note) (*datastore.Key,*datastore.Key,error) {
 	contentKey, err := retrievable.PlaceEntity(ctx, int64(0), &NewContent)
 	if err != nil { return contentKey,&datastore.Key{},err }
 	NewNote.ContentID = contentKey.IntID()
@@ -68,12 +70,12 @@ func CreateNewNote(ctx context.Context,NewContent Content,NewNote Note) (*datast
 	return contentKey,noteKey,err
 }
 
-func UpdateNoteContent(ctx context.Context, res http.ResponseWriter,req *http.Request,user *User,id string,UpdatedContent Content, UpdatedNote Note) error {
+func UpdateNoteContent(ctx Context,id string,UpdatedContent Content, UpdatedNote Note) error {
 	Note := Note{}
 	noteID, err := strconv.ParseInt(id, 10, 64); if err != nil { return err }
 	err = retrievable.GetEntity(ctx, noteID, &Note); if err != nil { return err }
-	validated := VerifyNotePermission(res, req, user, &Note); if !validated { return errors.New("Permission Error: Not Allowed") }
-	if Note.OwnerID == int64(user.IntID) { Note.Protected = UpdatedNote.Protected }	
+	validated := VerifyNotePermission(ctx, &Note); if !validated { return errors.New("Permission Error: Not Allowed") }
+	if Note.OwnerID == int64(ctx.user.IntID) { Note.Protected = UpdatedNote.Protected }	
 	_, err = retrievable.PlaceEntity(ctx, noteID, &Note); if err != nil { return err }
 	_, err = retrievable.PlaceEntity(ctx, Note.ContentID, &UpdatedContent); return err
 }

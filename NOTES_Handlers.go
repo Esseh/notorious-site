@@ -50,14 +50,14 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 	)
 	if ErrorPage(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) { return }
 	
-	http.Redirect(res, req, "/view/"+strconv.FormatInt(noteKey.IntID(), 10), http.StatusSeeOther)
+	ctx.Redirect("/view/"+strconv.FormatInt(noteKey.IntID(), 10))
 }
 
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	if ctx.AssertLoggedInFailed() { return }
 	
-	ViewNote, ViewContent, err := GetExistingNote(params.ByName("ID"), ctx)
+	ViewNote, ViewContent, err := GetExistingNote(ctx,params.ByName("ID"))
 	if ErrorPage(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
 	owner, err := GetUserFromID(ctx, ViewNote.OwnerID)
@@ -86,10 +86,10 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	if ctx.AssertLoggedInFailed() { return }
-	ViewNote, ViewContent, err := GetExistingNote(params.ByName("ID"), ctx)
+	ViewNote, ViewContent, err := GetExistingNote(ctx,params.ByName("ID"))
 	if ErrorPage(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
-	validated := VerifyNotePermission(res, req, ctx.user, ViewNote); if !validated { return }
+	validated := VerifyNotePermission(ctx, ViewNote); if !validated { return }
 
 	Body := template.HTML(ViewContent.Content)
 	ServeTemplateWithParams(res, "editnote", struct {
@@ -113,7 +113,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 	protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 	if ErrorPage(ctx, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
 
-	err := UpdateNoteContent(ctx, res,req ,ctx.user ,req.FormValue("notekey"),
+	err := UpdateNoteContent(ctx,req.FormValue("notekey"),
 		Content{
 			Content: EscapeString(req.FormValue("note")),
 			Title: req.FormValue("title"),
@@ -123,5 +123,5 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 		},
 	)
 	if ErrorPage(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) { return }	
-	http.Redirect(res, req, "/view/"+req.FormValue("notekey"), http.StatusSeeOther)
+	ctx.Redirect("/view/"+req.FormValue("notekey"))
 }
