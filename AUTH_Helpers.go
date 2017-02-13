@@ -291,14 +291,15 @@ func GetEmailFromID(req *http.Request, id int64) (string, error) {
 // Checks if the user is logged in.
 // If not then it redirects to the login screen.
 //=============================================================================================
-func MustLogin(res http.ResponseWriter, req *http.Request) bool {
-	_, err := GetUserFromSession(req)
+func MustLogin(res http.ResponseWriter, req *http.Request) (*User,bool) {
+	validation := false
+	user, err := GetUserFromSession(req)
 	if err != nil {
 		path := strings.Replace(req.URL.Path[1:], "%2f", "/", -1)
 		http.Redirect(res, req, PATH_AUTH_Login+"?redirect="+path, http.StatusSeeOther)
-		return true
+		validation = true
 	}
-	return false
+	return user, validation
 }
 
 //=============================================================================================

@@ -28,9 +28,15 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 
 
 func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	if MustLogin(res, req) { return }
+	_,validated := MustLogin(res, req); if validated { return }
 	ServeTemplateWithParams(res, "new-note", MakeHeader(res, req, false, true))
 }
+
+
+
+
+
+
 
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	u, err := GetUserFromSession(req) // Check if a user is already logged in.
@@ -71,6 +77,15 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 	log.Infof(ctx, "Information being submitted: ", NewNote, NewContent)
 	http.Redirect(res, req, "/view/"+strconv.FormatInt(newkey.IntID(), 10), http.StatusSeeOther)
 }
+
+
+
+
+
+
+
+
+
 
 /// TODO: implement
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {

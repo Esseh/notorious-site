@@ -29,10 +29,7 @@ const (
 // Profile
 //===========================================================================
 func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	if MustLogin(res, req) {
-		return
-	}
-	u, _ := GetUserFromSession(req)
+	u,validated := MustLogin(res, req); if validated { return }
 	err := ServeTemplateWithParams(res, "profile-settings", struct {
 		HeaderData
 		ErrorResponseProfile string
