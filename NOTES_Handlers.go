@@ -25,14 +25,15 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 
 
 func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	_,validated := MustLogin(res, req); if !validated { return }
+	ctx := NewContext(res,req)
+	if ctx.AssertLoggedInFailed() { return }
 	ServeTemplateWithParams(res, "new-note", MakeHeader(res, req, false, true))
 }
 
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	user, validated := MustLogin(res,req); if !validated { return }
 	ctx := NewContext(res,req)
-
+	if ctx.AssertLoggedInFailed() { return }
+	
 	protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
 
@@ -43,7 +44,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 			Content: req.FormValue("note"),
 		},
 		Note{
-			OwnerID:   int64(user.IntID),
+			OwnerID:   int64(ctx.user.IntID),
 			Protected: protected,
 		},
 	)
@@ -53,9 +54,9 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 }
 
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	user, validated := MustLogin(res,req);  if !validated { return }
 	ctx := NewContext(res,req)
-
+	if ctx.AssertLoggedInFailed() { return }
+	
 	ViewNote, ViewContent, err := GetExistingNote(params.ByName("ID"), ctx)
 	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
@@ -76,19 +77,19 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 		Title:         ViewContent.Title,
 		Notekey:       params.ByName("ID"),
 		Content:       NoteBody,
-		User:          user,
+		User:          ctx.user,
 		Owner:         owner,
 	})
 
 }
 
 func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	user, validated := MustLogin(res,req); if !validated { return }
 	ctx := NewContext(res,req)
+	if ctx.AssertLoggedInFailed() { return }
 	ViewNote, ViewContent, err := GetExistingNote(params.ByName("ID"), ctx)
 	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
-	validated = VerifyNotePermission(res, req, user, ViewNote); if !validated { return }
+	validated := VerifyNotePermission(res, req, ctx.user, ViewNote); if !validated { return }
 
 	Body := template.HTML(ViewContent.Content)
 	ServeTemplateWithParams(res, "editnote", struct {
@@ -106,13 +107,13 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 }
 
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	user, validated := MustLogin(res,req); if !validated { return }
 	ctx := NewContext(res,req)
-
+	if ctx.AssertLoggedInFailed() { return }
+	
 	protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
 
-	err := UpdateNoteContent(ctx, res,req ,user ,req.FormValue("notekey"),
+	err := UpdateNoteContent(ctx, res,req ,ctx.user ,req.FormValue("notekey"),
 		Content{
 			Content: EscapeString(req.FormValue("note")),
 			Title: req.FormValue("title"),

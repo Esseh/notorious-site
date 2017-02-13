@@ -1,5 +1,6 @@
 package main
 import (
+	"strings"
 	"errors"
 	"net/http"
 	"golang.org/x/net/context"
@@ -11,11 +12,32 @@ import (
 
 
 type Context struct {
+	req *http.Request
+	res http.ResponseWriter
+	user *User
+	userException error
 	context.Context
 }
 
+func (ctx Context)AssertLoggedInFailed() bool {
+	if ctx.userException != nil {
+		path := strings.Replace(ctx.req.URL.Path[1:], "%2f", "/", -1)
+		http.Redirect(ctx.res, ctx.req, PATH_AUTH_Login+"?redirect="+path, http.StatusSeeOther)
+		return true
+	}
+	return false
+}
+
 func NewContext(res http.ResponseWriter, req *http.Request) Context{
-	return Context { appengine.NewContext(req) }
+	user, err := GetUserFromSession(req)
+	ctx := Context { 
+		req: req,
+		res: res,
+		user: user,
+		userException: err,
+	}
+	ctx.Context = appengine.NewContext(req)
+	return ctx
 }
 
 func GetExistingNote(id string, ctx context.Context)(*Note,*Content,error){

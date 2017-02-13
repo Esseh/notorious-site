@@ -29,7 +29,8 @@ const (
 // Profile
 //===========================================================================
 func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u,validated := MustLogin(res, req); if validated { return }
+	ctx := NewContext(res,req)
+	if ctx.AssertLoggedInFailed() { return }
 	err := ServeTemplateWithParams(res, "profile-settings", struct {
 		HeaderData
 		ErrorResponseProfile string
@@ -37,7 +38,7 @@ func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params ht
 	}{
 		*MakeHeader(res, req, true, true),
 		req.FormValue("ErrorResponseProfile"),
-		u,
+		ctx.user,
 	})
 	if err != nil {
 		fmt.Fprint(res, err)
