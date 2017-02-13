@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/Esseh/retrievable"
-	"google.golang.org/appengine"
 )
 
 // Logs the user in with an OAuth id.
@@ -22,13 +21,13 @@ func OAuthLogin(req *http.Request, res http.ResponseWriter, id, first, last, red
 
 // Logins using OAuth
 func LoginFromOauth(res http.ResponseWriter, req *http.Request, email string) error {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	l := LoginOauthAccount{}
 	err := retrievable.GetEntity(ctx, email, &l)
 	if err != nil {
 		return ErrNoUser
 	}
-	sessID, err := AUTH_CreateSessionID(ctx, req, l.UserID)
+	sessID, err := AUTH_CreateSessionID(ctx, l.UserID)
 	if err != nil {
 		return err
 	}
@@ -41,7 +40,7 @@ func LoginFromOauth(res http.ResponseWriter, req *http.Request, email string) er
 
 // Registers using OAuth
 func RegisterFromOauth(res http.ResponseWriter, req *http.Request, email, first, last string) error {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	checkLogin := LoginOauthAccount{}
 
 	// Check that user does not exist
@@ -67,7 +66,7 @@ func RegisterFromOauth(res http.ResponseWriter, req *http.Request, email, first,
 		return putErr
 	}
 
-	sessID, err := AUTH_CreateSessionID(ctx, req, lkey.IntID())
+	sessID, err := AUTH_CreateSessionID(ctx, lkey.IntID())
 	if err != nil {
 		return err
 	}

@@ -1,5 +1,5 @@
 /// Contains the structure for our logins/user structure.
-package AUTH
+package main
 
 import (
 	"github.com/Esseh/retrievable"
