@@ -27,7 +27,7 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	if ctx.AssertLoggedInFailed() { return }
-	ServeTemplateWithParams(res, "new-note", MakeHeader(res, req, false, true))
+	ServeTemplateWithParams(res, "new-note", MakeHeader(ctx))
 }
 
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
@@ -35,7 +35,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 	if ctx.AssertLoggedInFailed() { return }
 	
 	protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
-	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
+	if ErrorPage(ctx, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
 
 	
 	_, noteKey, err := CreateNewNote(ctx,
@@ -48,7 +48,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 			Protected: protected,
 		},
 	)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) { return }
+	if ErrorPage(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) { return }
 	
 	http.Redirect(res, req, "/view/"+strconv.FormatInt(noteKey.IntID(), 10), http.StatusSeeOther)
 }
@@ -58,10 +58,10 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 	if ctx.AssertLoggedInFailed() { return }
 	
 	ViewNote, ViewContent, err := GetExistingNote(params.ByName("ID"), ctx)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
+	if ErrorPage(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
 	owner, err := GetUserFromID(ctx, ViewNote.OwnerID)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) { return }
+	if ErrorPage(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) { return }
 
 	NoteBody := template.HTML(EscapeString(ViewContent.Content))
 
@@ -71,7 +71,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 		Content                                    template.HTML
 		User, Owner                                *User
 	}{
-		HeaderData:    *MakeHeader(res, req, false, true),
+		HeaderData:    *MakeHeader(ctx),
 		RedirectURL:   req.FormValue("redirect"),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 		Title:         ViewContent.Title,
@@ -87,7 +87,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 	ctx := NewContext(res,req)
 	if ctx.AssertLoggedInFailed() { return }
 	ViewNote, ViewContent, err := GetExistingNote(params.ByName("ID"), ctx)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
+	if ErrorPage(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
 	validated := VerifyNotePermission(res, req, ctx.user, ViewNote); if !validated { return }
 
@@ -97,7 +97,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 		ErrorResponse, RedirectURL, Title, Notekey string
 		Content                                    template.HTML
 	}{
-		HeaderData:    *MakeHeader(res, req, false, true),
+		HeaderData:    *MakeHeader(ctx),
 		RedirectURL:   req.FormValue("redirect"),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 		Title:         ViewContent.Title,
@@ -111,7 +111,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 	if ctx.AssertLoggedInFailed() { return }
 	
 	protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
-	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
+	if ErrorPage(ctx, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
 
 	err := UpdateNoteContent(ctx, res,req ,ctx.user ,req.FormValue("notekey"),
 		Content{
@@ -122,6 +122,6 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 			Protected: protbool,
 		},
 	)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) { return }	
+	if ErrorPage(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) { return }	
 	http.Redirect(res, req, "/view/"+req.FormValue("notekey"), http.StatusSeeOther)
 }

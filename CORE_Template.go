@@ -12,7 +12,6 @@ import (
 	"github.com/Esseh/retrievable"
 	humanize "github.com/dustin/go-humanize" // russross markdown parser
 	"golang.org/x/net/context"
-	"google.golang.org/appengine"
 )
 
 // Global Template file.
@@ -49,8 +48,6 @@ func ServeTemplateWithParams(res http.ResponseWriter, templateName string, param
 // Header Data,
 // Present in most template executions. (Unless it's an internal it should be assumed to be used.)
 type HeaderData struct {
-	ShowLogin    bool
-	ShowRegister bool
 	Ctx          context.Context
 	User         *User
 	CurrentPath  string
@@ -59,18 +56,15 @@ type HeaderData struct {
 // Constructs the header.
 // As the header gets more complex(such as capturing the current path)
 // the need for such a helper function increases.
-func MakeHeader(res http.ResponseWriter, req *http.Request, login, register bool) *HeaderData {
-	u, _ := GetUserFromSession(req)
-	oldCookie, err := GetCookieValue(req, "session")
-	if err == nil {
-		MakeCookie(res, "session", oldCookie)
-	}
-	redirectURL := req.URL.Path[1:]
+func MakeHeader(ctx Context) *HeaderData {
+	oldCookie, err := GetCookieValue(ctx.req, "session")
+	if err == nil { MakeCookie(ctx.res, "session", oldCookie) }
+	redirectURL := ctx.req.URL.Path[1:]
 	if redirectURL == "login" || redirectURL == "register" || redirectURL == "elevatedlogin" {
-		redirectURL = req.URL.Query().Get("redirect")
+		redirectURL = ctx.req.URL.Query().Get("redirect")
 	}
 	return &HeaderData{
-		login, register, appengine.NewContext(req), u, redirectURL,
+		ctx, ctx.user, redirectURL,
 	}
 }
 

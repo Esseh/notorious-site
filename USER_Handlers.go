@@ -8,8 +8,6 @@ import (
 
 	"github.com/Esseh/retrievable"
 	"github.com/julienschmidt/httprouter"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
 )
 
 func INIT_USERS_HANDLERS(r *httprouter.Router) {
@@ -36,7 +34,7 @@ func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params ht
 		ErrorResponseProfile string
 		User                 *User
 	}{
-		*MakeHeader(res, req, true, true),
+		*MakeHeader(ctx),
 		req.FormValue("ErrorResponseProfile"),
 		ctx.user,
 	})
@@ -51,9 +49,9 @@ func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params h
 	u.First = req.FormValue("first")
 	u.Last = req.FormValue("last")
 	u.Bio = req.FormValue("bio")
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	_, err := retrievable.PlaceEntity(ctx, u.IntID, u)
-	if ErrorPage(ctx, res, nil, "server error placing key", err, http.StatusBadRequest) {
+	if ErrorPage(ctx, "server error placing key", err, http.StatusBadRequest) {
 		return
 	}
 
@@ -63,22 +61,21 @@ func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params h
 // TODO: Implement
 func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	u, _ := GetUserFromSession(req)
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 
 	rdr, hdr, err := req.FormFile("avatar")
-	if ErrorPage(ctx, res, nil, "upload image thingy", err, http.StatusBadRequest) {
+	if ErrorPage(ctx, "upload image thingy", err, http.StatusBadRequest) {
 		return
 	}
 	defer rdr.Close()
 	u.Avatar = true
 	err2 := UploadAvatar(ctx, int64(u.IntID), hdr, rdr)
-	log.Infof(ctx, "error: ", err2)
 
 	if err2 != nil {
 		fmt.Fprint(res, err2)
 	}
 	_, err = retrievable.PlaceEntity(ctx, u.IntID, u)
-	if ErrorPage(ctx, res, nil, "server error placing key", err, http.StatusBadRequest) {
+	if ErrorPage(ctx, "server error placing key", err, http.StatusBadRequest) {
 		return
 	}
 	http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(u.IntID), 10), http.StatusSeeOther)
@@ -88,20 +85,17 @@ func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, pa
 // Profile View
 //===========================================================================
 func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := appengine.NewContext(req)
-	u, _ := GetUserFromSession(req)
+	ctx := NewContext(res,req)
 	id, convErr := strconv.ParseInt(params.ByName("ID"), 10, 64)
-	if ErrorPage(ctx, res, nil, "Invalid ID", convErr, http.StatusBadRequest) {
+	if ErrorPage(ctx, "Invalid ID", convErr, http.StatusBadRequest) {
 		return
 	}
 	ci, getErr := GetUserFromID(ctx, id)
-	if ErrorPage(ctx, res, u, "Not a valid user ID", getErr, http.StatusNotFound) {
+	if ErrorPage(ctx, "Not a valid user ID", getErr, http.StatusNotFound) {
 		return
 	}
-	log.Infof(ctx, "error ID: ", id)
 	notes, err := GetAllNotes(ctx, id)
-	log.Infof(ctx, "error: ", len(notes))
-	if ErrorPage(ctx, res, nil, "Internal Server Error", err, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error", err, http.StatusSeeOther) {
 		return
 	}
 	screen := struct {
@@ -109,7 +103,7 @@ func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params ht
 		Data     *User
 		AllNotes []NoteOutput
 	}{
-		*MakeHeader(res, req, true, true),
+		*MakeHeader(ctx),
 		ci,
 		notes,
 	}

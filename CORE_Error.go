@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"strings"
 
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
 )
 
@@ -42,11 +41,11 @@ var (
 ////  True: Parent should cease execution, error has been found.
 ////  False: No Error, Parent may ignore this function.
 /// Usage: Use if there is no constructive alternative.
-func ErrorPage(ctx context.Context, res http.ResponseWriter, u *User, ErrorTitle string, e error, errCode int) bool {
+func ErrorPage(ctx Context, ErrorTitle string, e error, errCode int) bool {
 	if e != nil {
 		log.Errorf(ctx, "%s ---- %v\n", ErrorTitle, e)
-		if u == nil {
-			u = &User{}
+		if ctx.user == nil {
+			ctx.user = &User{}
 		}
 		args := &struct {
 			Header    HeaderData
@@ -54,10 +53,10 @@ func ErrorPage(ctx context.Context, res http.ResponseWriter, u *User, ErrorTitle
 			ErrorDump error
 			ErrorCode int
 		}{
-			HeaderData{true, true, ctx, u, ""}, ErrorTitle, e, errCode,
+			HeaderData{ctx, ctx.user, ""}, ErrorTitle, e, errCode,
 		}
-		res.WriteHeader(errCode)
-		ServeTemplateWithParams(res, "site-error", args) // Execute the error page with the anonymous struct.
+		ctx.res.WriteHeader(errCode)
+		ServeTemplateWithParams(ctx.res, "site-error", args) // Execute the error page with the anonymous struct.
 		return true
 	}
 	return false

@@ -11,7 +11,6 @@ import (
 	"github.com/Esseh/retrievable"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/appengine"
 	
 	"google.golang.org/appengine/mail"
 )
@@ -42,24 +41,20 @@ func INIT_AUTH_HANDLERS(r *httprouter.Router) {
 // Login
 //=========================================================================================
 func AUTH_GET_Login(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	_, err := GetUserFromSession(req) // Check if a user is already logged in.
-	if err == nil {
-		http.Redirect(res, req, "/"+req.FormValue("redirect"), http.StatusSeeOther)
-		return
-	}
+	ctx := NewContext(res,req)
 
 	ServeTemplateWithParams(res, "login", struct {
 		HeaderData
 		ErrorResponse, RedirectURL string
 	}{
-		HeaderData:    *MakeHeader(res, req, false, true),
+		HeaderData:    *MakeHeader(ctx),
 		RedirectURL:   req.FormValue("redirect"),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 	})
 }
 
 func AUTH_POST_Login(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	username := strings.ToLower(req.FormValue("email"))
 	password := req.FormValue("password")
 	redirect := req.FormValue("redirect")
@@ -93,19 +88,20 @@ func AUTH_POST_Login(res http.ResponseWriter, req *http.Request, params httprout
 // ElevatedLogin
 //=========================================================================================
 func AUTH_GET_ElevatedLogin(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-
+	ctx := NewContext(res,req)
+	if ctx.AssertLoggedInFailed() { return }
 	ServeTemplateWithParams(res, "login", struct {
 		HeaderData
 		ErrorResponse, RedirectURL string
 	}{
-		HeaderData:    *MakeHeader(res, req, false, true),
+		HeaderData:    *MakeHeader(ctx),
 		RedirectURL:   req.FormValue("redirect"),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 	})
 }
 
 func AUTH_POST_ElevatedLogin(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	username := strings.ToLower(req.FormValue("email"))
 	password := req.FormValue("password")
 	redirect := req.FormValue("redirect")
@@ -139,19 +135,19 @@ func AUTH_POST_ElevatedLogin(res http.ResponseWriter, req *http.Request, params 
 //Logout
 //=========================================================================================
 func AUTH_GET_Logout(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	sessionIDStr, err := GetCookieValue(req, "session")
-	if ErrorPage(ctx, res, nil, "Must be logged in", err, http.StatusBadRequest) {
+	if ErrorPage(ctx, "Must be logged in", err, http.StatusBadRequest) {
 		return
 	}
 
 	sessionVal, err := strconv.ParseInt(sessionIDStr, 10, 0)
-	if ErrorPage(ctx, res, nil, "Bad cookie value", err, http.StatusBadRequest) {
+	if ErrorPage(ctx, "Bad cookie value", err, http.StatusBadRequest) {
 		return
 	}
 
 	err = retrievable.DeleteEntity(ctx, (&Session{}).Key(ctx, sessionVal))
-	if ErrorPage(ctx, res, nil, "No such session found!", err, 500) {
+	if ErrorPage(ctx, "No such session found!", err, 500) {
 		return
 	}
 
@@ -163,23 +159,20 @@ func AUTH_GET_Logout(res http.ResponseWriter, req *http.Request, params httprout
 //Register
 //=========================================================================================
 func AUTH_GET_Register(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, _ := GetUserFromSession(req) // Check if already logged in
-	if u.IntID != 0 {
-		http.Redirect(res, req, "/"+req.FormValue("redirect"), http.StatusSeeOther)
-		return
-	}
+	ctx := NewContext(res,req)
+	if ctx.AssertLoggedInFailed() { return }
 	ServeTemplateWithParams(res, "register", struct {
 		HeaderData
 		BusinessKey, ErrorResponse, RedirectURL string
 	}{
-		HeaderData:    *MakeHeader(res, req, true, false),
+		HeaderData:    *MakeHeader(ctx),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 		BusinessKey:   req.FormValue("BusinessKey"),
 		RedirectURL:   req.FormValue("redirect"),
 	})
 }
 func AUTH_POST_Register(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	nu := &User{ // Make the New User
 		Email:    strings.ToLower(req.FormValue("email")),
 		First:    req.FormValue("first"),
@@ -207,18 +200,18 @@ func AUTH_POST_Register(res http.ResponseWriter, req *http.Request, params httpr
 //ForgotPassword
 //=========================================================================================
 func AUTH_POST_ForgotPassword(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 	uid, err := GetUserIDFromEmail(ctx, req.FormValue("email")) // Get the User ID as well as making sure the user actually exists.
 	if err == nil {                                             // Proceed If the user is valid
 		u := User{}
 		err = retrievable.GetEntity(ctx, retrievable.IntID(uid), &u)
-		if ErrorPage(ctx, res, nil, "Internal Server Error (1)", err, http.StatusSeeOther) {
+		if ErrorPage(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) {
 			return
 		}
 
 		// Make one time password reset key
 		key, retErr := retrievable.PlaceEntity(ctx, int64(0), &PasswordReset{UID: uid, Creation: time.Now()})
-		if ErrorPage(ctx, res, nil, "Internal Server Error (2)", retErr, http.StatusSeeOther) {
+		if ErrorPage(ctx, "Internal Server Error (2)", retErr, http.StatusSeeOther) {
 			return
 		}
 
@@ -230,7 +223,7 @@ func AUTH_POST_ForgotPassword(res http.ResponseWriter, req *http.Request, params
 			Body:    "Change your password at http://www." + req.URL.Host + ".com/change using the following code:\n" + strconv.FormatInt(key.IntID(), 10),
 		}
 		err = mail.Send(ctx, msg)
-		if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) {
+		if ErrorPage(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) {
 			return
 		}
 	}
@@ -242,16 +235,13 @@ func AUTH_POST_ForgotPassword(res http.ResponseWriter, req *http.Request, params
 //ResetPassword
 //=========================================================================================
 func AUTH_GET_ResetPassword(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, _ := GetUserFromSession(req)
-	if u.IntID != 0 {
-		http.Redirect(res, req, "/", http.StatusSeeOther)
-		return
-	}
+	ctx := NewContext(res,req)
+	if ctx.AssertLoggedInFailed() { return }
 	ServeTemplateWithParams(res, "resetPassword", struct {
 		HeaderData
 		ErrorResponse string
 	}{
-		HeaderData:    *MakeHeader(res, req, true, true),
+		HeaderData:    *MakeHeader(ctx),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 	})
 }
@@ -265,52 +255,52 @@ func AUTH_POST_ResetPassword(res http.ResponseWriter, req *http.Request, params 
 		return
 	}
 
-	ctx := appengine.NewContext(req)
+	ctx := NewContext(res,req)
 
 	// Retrieve the Password Reset
 	pr := PasswordReset{}
 	prKey, _ := strconv.ParseInt(key, 10, 64)
 	getErr := retrievable.GetEntity(ctx, prKey, &pr)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", getErr, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (1)", getErr, http.StatusSeeOther) {
 		return
 	}
 
 	// Retrieve the User
 	u := User{}
 	getErr2 := retrievable.GetEntity(ctx, pr.UID, &u)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", getErr2, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (2)", getErr2, http.StatusSeeOther) {
 		return
 	}
 
 	// Generate New Password
 	cryptPass, cryptErr := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (3)", cryptErr, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (3)", cryptErr, http.StatusSeeOther) {
 		return
 	}
 
 	// Get the Login Information
 	loginAccount := LoginLocalAccount{}
 	getErr3 := retrievable.GetEntity(ctx, u.Email, &loginAccount)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (4)", getErr3, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (4)", getErr3, http.StatusSeeOther) {
 		return
 	}
 
 	// Update the Login Information
 	loginAccount.Password = cryptPass
 	_, placeErr := retrievable.PlaceEntity(ctx, u.Email, &loginAccount)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (4)", placeErr, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (4)", placeErr, http.StatusSeeOther) {
 		return
 	}
 
 	// Get the datastore key of the password reset entry
 	cleanup, placeErr2 := retrievable.PlaceEntity(ctx, prKey, &pr)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (5)", placeErr2, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (5)", placeErr2, http.StatusSeeOther) {
 		return
 	}
 
 	// Delete the password reset entry
 	delErr := retrievable.DeleteEntity(ctx, cleanup)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (6)", delErr, http.StatusSeeOther) {
+	if ErrorPage(ctx, "Internal Server Error (6)", delErr, http.StatusSeeOther) {
 		return
 	}
 
