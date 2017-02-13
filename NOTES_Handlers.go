@@ -32,60 +32,31 @@ func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter
 	ServeTemplateWithParams(res, "new-note", MakeHeader(res, req, false, true))
 }
 
-
-
-
-
-
-
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, err := GetUserFromSession(req) // Check if a user is already logged in.
-	ctx := appengine.NewContext(req)
+	user, validated := MustLogin(res,req); if validated { return }
+	ctx := NewContext(res,req)
 
-	if err != nil {
-		http.Redirect(res, req, "/"+req.FormValue("redirect"), http.StatusSeeOther)
-		return
-	}
-
-	data := req.FormValue("note")
-	title := req.FormValue("title")
-	protected, boolerr := strconv.ParseBool(req.FormValue("protection"))
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", boolerr, http.StatusSeeOther) {
-		return
-	}
-
+	protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
+	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) { return }
+	
 	NewContent := Content{
-		Title:   title,
-		Content: data,
+		Title:   req.FormValue("title"),
+		Content: req.FormValue("note"),
 	}
 
 	key, err := retrievable.PlaceEntity(ctx, int64(0), &NewContent)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) {
-		return
-	}
+	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) { return }
 
 	NewNote := Note{
-		OwnerID:   int64(u.IntID),
+		OwnerID:   int64(user.IntID),
 		Protected: protected,
 		ContentID: key.IntID(),
 	}
 
 	newkey, err := retrievable.PlaceEntity(ctx, int64(0), &NewNote)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) {
-		return
-	}
-	log.Infof(ctx, "Information being submitted: ", NewNote, NewContent)
+	if ErrorPage(ctx, res, nil, "Internal Server Error (3)", err, http.StatusSeeOther) { return }
 	http.Redirect(res, req, "/view/"+strconv.FormatInt(newkey.IntID(), 10), http.StatusSeeOther)
 }
-
-
-
-
-
-
-
-
-
 
 /// TODO: implement
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
