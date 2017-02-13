@@ -28,11 +28,9 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 
 
 func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	if MustLogin(res, req) {
-		return
-	}
+	if MustLogin(res, req) { return }
 
-	ServeTemplateWithParams(res, "newnote", struct {
+	ServeTemplateWithParams(res, "new-note", struct {
 		HeaderData
 		ErrorResponse, RedirectURL string
 	}{
