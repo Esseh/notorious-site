@@ -9,18 +9,16 @@ var (
 	NoteTable = "NotePermissions"
 )
 
-// TODO: utilize
 type Note struct {
-	OwnerID int64 // owner of the note, can set permissions
-	//Collab []int64			// any people collabing, stretch goal
-	Protected bool  // if true then it is not publically editable.
-	ContentID int64 // Reference to the content of the note.
-}
-type Content struct {
-	Title, Content string // Content can be raw html or markdown
+	OwnerID int64
+	Protected bool
+	ContentID int64
 }
 
-// int64 Keys
+type Content struct {
+	Title, Content string
+}
+
 func (n *Note) Key(ctx context.Context, key interface{}) *datastore.Key {
 	return datastore.NewKey(ctx, NoteTable, "", key.(int64), nil)
 }

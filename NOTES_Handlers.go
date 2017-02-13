@@ -97,37 +97,21 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 
 }
 
-/// TODO: implement
+
+
+
+
+
+
+
+
 func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, err := GetUserFromSession(req) // Check if a user is already logged in.
-	ctx := appengine.NewContext(req)
+	user, validated := MustLogin(res,req); if !validated { return }
+	ctx := NewContext(res,req)
+	ViewNote, ViewContent, err := GetNoteData(params.ByName("ID"), ctx)
+	if ErrorPage(ctx, res, nil, "Internal Server Error (1)", err, http.StatusSeeOther) { return }
 
-	NoteKeyStr := params.ByName("ID")
-	NoteKey, err := strconv.ParseInt(NoteKeyStr, 10, 64)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) {
-		return
-	}
-
-	ViewNote := &Note{}
-	ViewContent := &Content{}
-
-	err = retrievable.GetEntity(ctx, NoteKey, ViewNote)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) {
-		return
-	}
-
-	// Permission Check, For collaberation it can also check against a collaborator container after the user check.
-	// When setting for example, privacy setting might only be able to be set by the Owner so a separation is still needed.
-	if ViewNote.OwnerID != int64(u.IntID) && ViewNote.Protected {
-		// Soft rejection. can also be substituted for a http Not Allowed.
-		http.Redirect(res, req, "/view/"+NoteKeyStr, http.StatusSeeOther)
-		return
-	}
-
-	err = retrievable.GetEntity(ctx, ViewNote.ContentID, ViewContent)
-	if ErrorPage(ctx, res, nil, "Internal Server Error (2)", err, http.StatusSeeOther) {
-		return
-	}
+	validated := VerifyNotePermission(res, req, user, ViewNote); if !validated { return }
 
 	Body := template.HTML(ViewContent.Content)
 	ServeTemplateWithParams(res, "editnote", struct {
@@ -139,10 +123,27 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 		RedirectURL:   req.FormValue("redirect"),
 		ErrorResponse: req.FormValue("ErrorResponse"),
 		Title:         ViewContent.Title,
-		Notekey:       NoteKeyStr,
+		Notekey:       params.ByName("ID"),
 		Content:       Body,
 	})
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// TODO: implement
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
