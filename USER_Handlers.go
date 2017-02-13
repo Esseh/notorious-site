@@ -45,7 +45,7 @@ func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params ht
 
 // TODO: Implement
 func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, _ := GetUserFromSession(req)
+	u, _ := AUTH_GetUserFromSession(req)
 	u.First = req.FormValue("first")
 	u.Last = req.FormValue("last")
 	u.Bio = req.FormValue("bio")
@@ -60,7 +60,7 @@ func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params h
 
 // TODO: Implement
 func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, _ := GetUserFromSession(req)
+	u, _ := AUTH_GetUserFromSession(req)
 	ctx := NewContext(res,req)
 
 	rdr, hdr, err := req.FormFile("avatar")
@@ -90,7 +90,7 @@ func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params ht
 	if ErrorPage(ctx, "Invalid ID", convErr, http.StatusBadRequest) {
 		return
 	}
-	ci, getErr := GetUserFromID(ctx, id)
+	ci, getErr := AUTH_GetUserFromID(ctx, id)
 	if ErrorPage(ctx, "Not a valid user ID", getErr, http.StatusNotFound) {
 		return
 	}

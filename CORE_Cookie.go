@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 )
-
+const sessionTime = 7 * 24 * 60 * 60
 func createHmac(value string) ([]byte, error) {
 	mac := hmac.New(sha256.New, []byte(HMAC_Key))
 	_, err := io.WriteString(mac, value)

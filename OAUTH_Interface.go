@@ -28,7 +28,7 @@ func LoginFromOauth(res http.ResponseWriter, req *http.Request, email string) er
 	if err != nil {
 		return ErrNoUser
 	}
-	sessID, err := CreateSessionID(ctx, req, l.UserID)
+	sessID, err := AUTH_CreateSessionID(ctx, req, l.UserID)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func RegisterFromOauth(res http.ResponseWriter, req *http.Request, email, first,
 		return putErr
 	}
 
-	sessID, err := CreateSessionID(ctx, req, lkey.IntID())
+	sessID, err := AUTH_CreateSessionID(ctx, req, lkey.IntID())
 	if err != nil {
 		return err
 	}

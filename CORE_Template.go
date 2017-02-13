@@ -21,7 +21,7 @@ func init() {
 	// Tie functions into template here with ... "functionName":theFunction,
 	funcMap := template.FuncMap{
 		"getAvatarURL":  getAvatarURL,
-		"getUser":       GetUserFromID,
+		"getUser":       AUTH_GetUserFromID,
 		"humanize":      humanize.Time,
 		"humanizeSize":  humanize.Bytes,
 		"monthfromtime": monthfromtime,

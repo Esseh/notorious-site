@@ -1,4 +1,4 @@
-package main
+package AUTH
 
 import (
 	"net/http"
@@ -33,17 +33,17 @@ func AUTH_GET_Login(res http.ResponseWriter, req *http.Request, params httproute
 
 func AUTH_POST_Login(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
-	if !ValidLogin(req.FormValue("email"), req.FormValue("password")) {
+	if !AUTH_ValidLogin(req.FormValue("email"), req.FormValue("password")) {
 		BackWithError(ctx, ErrInvalidLogin, "Invalid Login Information")
 	} else {
-		response, err := LoginToWebsite(ctx,req.FormValue("email"), req.FormValue("password"))
+		response, err := AUTH_LoginToWebsite(ctx,req.FormValue("email"), req.FormValue("password"))
 		if !BackWithError(ctx, err, response) { ctx.Redirect("/"+req.FormValue("redirect")) }
 	}
 }
 
 func AUTH_GET_Logout(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
-	response,err := LogoutFromWebsite(ctx)	
+	response,err := AUTH_LogoutFromWebsite(ctx)	
 	if !ErrorPage(ctx, response, err, http.StatusBadRequest) {  ctx.Redirect("/"+req.FormValue("redirect")) }
 }
 
@@ -60,7 +60,7 @@ func AUTH_GET_Register(res http.ResponseWriter, req *http.Request, params httpro
 }
 func AUTH_POST_Register(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
-	response, err := RegisterNewUser(
+	response, err := AUTH_RegisterNewUser(
 		ctx,
 		req.FormValue("email"),
 		req.FormValue("password"),

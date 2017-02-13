@@ -31,7 +31,7 @@ func (ctx Context)AssertLoggedInFailed() bool {
 func (ctx Context)Redirect(uri string){ http.Redirect(ctx.res, ctx.req, uri, http.StatusSeeOther) }
 
 func NewContext(res http.ResponseWriter, req *http.Request) Context{
-	user, err := GetUserFromSession(req)
+	user, err := AUTH_GetUserFromSession(req)
 	ctx := Context { 
 		req: req,
 		res: res,
@@ -81,37 +81,3 @@ func UpdateNoteContent(ctx Context,id string,UpdatedContent Content, UpdatedNote
 }
 
 
-func ValidLogin(username,password string) bool {
-	return password != "" && username != ""
-}
-
-func LoginToWebsite(ctx Context,username,password string) (string, error) {
-	userID, err := GetUserIDFromLogin(ctx, strings.ToLower(username), password)
-	if err != nil { return "Login Information Is Incorrect", err }
-	sessionID, err := CreateSessionID(ctx, ctx.req, userID)
-	if err != nil { return "Login error, try again later.", err }
-	err = MakeCookie(ctx.res, "session", strconv.FormatInt(sessionID, 10))
-	return "Login error, try again later.",err
-}
-
-func LogoutFromWebsite(ctx Context)(string, error){
-	sessionIDStr, err := GetCookieValue(ctx.req, "session")
-	if err != nil { return "Must be logged in", err }
-	sessionVal, err := strconv.ParseInt(sessionIDStr, 10, 0)	
-	if err != nil { return "Bad cookie value", err }
-	err = retrievable.DeleteEntity(ctx, (&Session{}).Key(ctx, sessionVal))
-	if err == nil { DeleteCookie(ctx.res, "session") }
-	return "No such session found!", err
-}
-
-func RegisterNewUser(ctx Context, username, password, confirmPassword, firstName, lastName string)(string,error){
-	newUser := &User{ // Make the New User
-		Email:    strings.ToLower(username),
-		First:    firstName,
-		Last:     lastName,
-	}		
-	if !ValidLogin(username,password) { return "Invalid Login Information", errors.New("Bad Login") }
-	if password != confirmPassword { return "Passwords Do Not Match", errors.New("Password Mismatch") }
-	_, err := CreateUserFromLogin(ctx, newUser.Email, password, newUser)
-	return "Username Taken", err
-}
