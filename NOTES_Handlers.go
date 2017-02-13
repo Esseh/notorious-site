@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	PATH_NOTES_document = "/document" //// TODO: remove prototype
 	PATH_NOTES_New      = "/new"
 	PATH_NOTES_View     = "/view/:ID"
 	PATH_NOTES_Editor   = "/edit/:ID"
@@ -27,8 +26,6 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.GET(PATH_NOTES_View, NOTES_GET_View)
 	r.GET(PATH_NOTES_Editor, NOTES_GET_Editor)
 	r.POST(PATH_NOTES_Edit, NOTES_POST_Editor)
-	r.GET(PATH_NOTES_document, NOTES_GET_DOCUMENT)   // TODO: remove prototype
-	r.POST(PATH_NOTES_document, NOTES_POST_DOCUMENT) // TODO: remove prototype
 	
 	// Test For Matthew
 	r.GET(PATH_NOTES_Reference_Test, NOTES_GET_Reference_TestBed)
@@ -300,36 +297,4 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 	}
 
 	http.Redirect(res, req, "/view/"+notekey, http.StatusSeeOther)
-}
-
-//// TODO: remove prototype
-func NOTES_GET_DOCUMENT(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	_, err := GetUserFromSession(req) // Check if a user is already logged in.
-	if err != nil {
-		http.Redirect(res, req, "/"+req.FormValue("redirect"), http.StatusSeeOther)
-		return
-	}
-
-	ServeTemplateWithParams(res, "document", struct {
-		HeaderData
-		ErrorResponse, RedirectURL string
-	}{
-		HeaderData:    *MakeHeader(res, req, false, true),
-		RedirectURL:   req.FormValue("redirect"),
-		ErrorResponse: req.FormValue("ErrorResponse"),
-	})
-}
-
-func NOTES_POST_DOCUMENT(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	_, err := GetUserFromSession(req) // Check if a user is already logged in.
-	ctx := appengine.NewContext(req)
-
-	if err != nil {
-		http.Redirect(res, req, "/"+req.FormValue("redirect"), http.StatusSeeOther)
-		return
-	}
-	data := req.FormValue("note")
-	title := req.FormValue("title")
-	log.Infof(ctx, "info from js:", title, data)
-	http.Redirect(res, req, "/", http.StatusSeeOther)
 }
