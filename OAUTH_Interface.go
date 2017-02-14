@@ -1,4 +1,3 @@
-// Contains Helper functions involving OAuth interacitons.
 package main
 
 import (
@@ -24,17 +23,11 @@ func LoginFromOauth(res http.ResponseWriter, req *http.Request, email string) er
 	ctx := NewContext(res,req)
 	l := LoginOauthAccount{}
 	err := retrievable.GetEntity(ctx, email, &l)
-	if err != nil {
-		return ERROR_NoUser
-	}
+	if err != nil { return ERROR_NoUser }
 	sessID, err := AUTH_CreateSessionID(ctx, l.UserID)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	err = COOKIE_Make(res, "session", strconv.FormatInt(sessID, 10))
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	return nil
 }
 
@@ -44,35 +37,21 @@ func RegisterFromOauth(res http.ResponseWriter, req *http.Request, email, first,
 	checkLogin := LoginOauthAccount{}
 
 	// Check that user does not exist
-	if checkErr := retrievable.GetEntity(ctx, email, &checkLogin); checkErr == nil {
-		return checkErr
-	}
-
+	if checkErr := retrievable.GetEntity(ctx, email, &checkLogin); checkErr == nil { return checkErr }
 	u := User{
 		Email: email,
 		First: first,
 		Last:  last,
 	}
-
 	ukey, putUserErr := retrievable.PlaceEntity(ctx, int64(0), &u)
-	if putUserErr != nil {
-		return putUserErr
-	}
-
+	if putUserErr != nil { return putUserErr }
 	uLogin := LoginOauthAccount{}
 	uLogin.UserID = ukey.IntID()
 	lkey, putErr := retrievable.PlaceEntity(ctx, email, &uLogin)
-	if putErr != nil {
-		return putErr
-	}
-
+	if putErr != nil { return putErr }
 	sessID, err := AUTH_CreateSessionID(ctx, lkey.IntID())
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	err = COOKIE_Make(res, "session", strconv.FormatInt(sessID, 10))
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	return nil
 }

@@ -1,4 +1,3 @@
-// Contains data structures needed for our OAuth interactions.
 package main
 import(
 	"google.golang.org/appengine/datastore"
@@ -7,6 +6,7 @@ import(
 const ( 
 	OauthTable = "Oauth" 
 )
+// Login Information for Oauth. Functionally equivalent to LoginLocalAccount
 type LoginOauthAccount struct {
 	UserID int64
 }
