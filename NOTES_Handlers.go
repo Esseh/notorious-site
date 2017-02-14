@@ -34,12 +34,12 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 	if !ctx.AssertLoggedInFailed() {
 		protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 		if !ERROR_Page(ctx, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {		
-			_, noteKey, err := CreateNewNote(ctx,
-				Content{
+			_, noteKey, err := NOTES_CreateNewNote(ctx,
+				NOTES_Content{
 					Title:   req.FormValue("title"),
 					Content: req.FormValue("note"),
 				},
-				Note{
+				NOTES_Note{
 					OwnerID:   int64(ctx.user.IntID),
 					Protected: protected,
 				},
@@ -54,7 +54,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		ViewNote, ViewContent, err := GetExistingNote(ctx,params.ByName("ID"))
+		ViewNote, ViewContent, err := NOTES_GetExistingNote(ctx,params.ByName("ID"))
 		if !ERROR_Page(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) {
 			owner, err := AUTH_GetUserFromID(ctx, ViewNote.OwnerID)
 			if !ERROR_Page(ctx, "Internal Server Error (2)", err, http.StatusSeeOther) {
@@ -82,9 +82,9 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() { 
-		ViewNote, ViewContent, err := GetExistingNote(ctx,params.ByName("ID"))
+		ViewNote, ViewContent, err := NOTES_GetExistingNote(ctx,params.ByName("ID"))
 		if !ERROR_Page(ctx, "Internal Server Error (1)", err, http.StatusSeeOther) {
-			validated := VerifyNotePermission(ctx, ViewNote)
+			validated := NOTES_VerifyNotePermission(ctx, ViewNote)
 			if validated {
 				Body := template.HTML(ViewContent.Content)
 				ServeTemplateWithParams(res, "editnote", struct {
@@ -109,12 +109,12 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 	if !ctx.AssertLoggedInFailed() {
 		protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 		if !ERROR_Page(ctx, "Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
-			err := UpdateNoteContent(ctx,req.FormValue("notekey"),
-				Content{
+			err := NOTES_UpdateNoteContent(ctx,req.FormValue("notekey"),
+				NOTES_Content{
 					Content: EscapeString(req.FormValue("note")),
 					Title: req.FormValue("title"),
 				},
-				Note{
+				NOTES_Note{
 					Protected: protbool,
 				},
 			)
