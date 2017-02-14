@@ -27,7 +27,7 @@ func UploadAvatar(ctx context.Context, userID int64, header *multipart.FileHeade
 	}
 	imageBounds := m.Bounds()
 	if imageBounds.Dy() > maxAvatarSize || imageBounds.Dx() > maxAvatarSize {
-		return ErrTooLarge
+		return ERROR_TooLarge
 	}
 	if _, err = avatarReader.Seek(0, 0); err != nil {
 		return err

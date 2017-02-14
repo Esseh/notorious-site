@@ -51,7 +51,7 @@ func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params h
 	u.Bio = req.FormValue("bio")
 	ctx := NewContext(res,req)
 	_, err := retrievable.PlaceEntity(ctx, u.IntID, u)
-	if ErrorPage(ctx, "server error placing key", err, http.StatusBadRequest) {
+	if ERROR_Page(ctx, "server error placing key", err, http.StatusBadRequest) {
 		return
 	}
 
@@ -64,7 +64,7 @@ func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, pa
 	ctx := NewContext(res,req)
 
 	rdr, hdr, err := req.FormFile("avatar")
-	if ErrorPage(ctx, "upload image thingy", err, http.StatusBadRequest) {
+	if ERROR_Page(ctx, "upload image thingy", err, http.StatusBadRequest) {
 		return
 	}
 	defer rdr.Close()
@@ -75,7 +75,7 @@ func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, pa
 		fmt.Fprint(res, err2)
 	}
 	_, err = retrievable.PlaceEntity(ctx, u.IntID, u)
-	if ErrorPage(ctx, "server error placing key", err, http.StatusBadRequest) {
+	if ERROR_Page(ctx, "server error placing key", err, http.StatusBadRequest) {
 		return
 	}
 	http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(u.IntID), 10), http.StatusSeeOther)
@@ -87,15 +87,15 @@ func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, pa
 func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	id, convErr := strconv.ParseInt(params.ByName("ID"), 10, 64)
-	if ErrorPage(ctx, "Invalid ID", convErr, http.StatusBadRequest) {
+	if ERROR_Page(ctx, "Invalid ID", convErr, http.StatusBadRequest) {
 		return
 	}
 	ci, getErr := AUTH_GetUserFromID(ctx, id)
-	if ErrorPage(ctx, "Not a valid user ID", getErr, http.StatusNotFound) {
+	if ERROR_Page(ctx, "Not a valid user ID", getErr, http.StatusNotFound) {
 		return
 	}
 	notes, err := GetAllNotes(ctx, id)
-	if ErrorPage(ctx, "Internal Server Error", err, http.StatusSeeOther) {
+	if ERROR_Page(ctx, "Internal Server Error", err, http.StatusSeeOther) {
 		return
 	}
 	screen := struct {

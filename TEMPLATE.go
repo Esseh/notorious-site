@@ -57,8 +57,8 @@ type HeaderData struct {
 // As the header gets more complex(such as capturing the current path)
 // the need for such a helper function increases.
 func MakeHeader(ctx Context) *HeaderData {
-	oldCookie, err := GetCookieValue(ctx.req, "session")
-	if err == nil { MakeCookie(ctx.res, "session", oldCookie) }
+	oldCookie, err := COOKIE_GetValue(ctx.req, "session")
+	if err == nil { COOKIE_Make(ctx.res, "session", oldCookie) }
 	redirectURL := ctx.req.URL.Path[1:]
 	if redirectURL == "login" || redirectURL == "register" || redirectURL == "elevatedlogin" {
 		redirectURL = ctx.req.URL.Query().Get("redirect")

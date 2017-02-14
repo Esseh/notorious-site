@@ -63,7 +63,7 @@ func (l *AUTH_LoginLocalAccount) Place(ctx context.Context, key interface{}) (*d
 }
 
 func (l *AUTH_LoginLocalAccount) Key(ctx context.Context, key interface{}) *datastore.Key {
-	e, _ := Encrypt([]byte(key.(string)), encryptKey)
+	e, _ := AUTH_Encrypt([]byte(key.(string)), encryptKey)
 	return datastore.NewKey(ctx, LoginTable, e, 0, nil)
 }
 func (s *AUTH_Session) Key(ctx context.Context, key interface{}) *datastore.Key {

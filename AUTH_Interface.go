@@ -8,7 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"bytes"
+	"crypto/aes"
+	"encoding/base64"
+	
 	"github.com/Esseh/retrievable"
 	"github.com/mssola/user_agent"
 	"github.com/pariz/gountries"
@@ -17,6 +20,41 @@ import (
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
+
+// This key needs to be exactly 32 bytes long
+// TODO This should not be in our git repo
+var encryptKey = []byte{33, 44, 160, 6, 124, 138, 93, 47, 177, 135, 163, 154, 42, 14, 58, 17, 85, 133, 174, 207, 255, 52, 3, 26, 145, 21, 169, 65, 106, 108, 0, 66}
+
+// Encrypts data based on a key
+func AUTH_Encrypt(data []byte, key []byte) (string, error) {
+	b, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+	for len(data) < b.BlockSize() {
+		data = append(data, '=')
+	}
+	res := make([]byte, len(data))
+	b.Encrypt(res, data)
+	finalValue := base64.StdEncoding.EncodeToString(res)
+	return finalValue, nil
+}
+
+// Decrypts data based on a key
+func AUTH_Decrypt(data string, key []byte) ([]byte, error) {
+	b, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	strData, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
+	res := make([]byte, len(strData))
+	b.Decrypt(res, strData)
+	return bytes.TrimRight(res, "="), nil
+}
+
 
 // Retrieves an ID for AUTH_User from login information.
 func AUTH_GetUserIDFromLogin(ctx Context, email, password string) (int64, error) {
@@ -33,7 +71,7 @@ func AUTH_CreateUserFromLogin(ctx Context, email, password string, u *User) (*Us
 	checkLogin := AUTH_LoginLocalAccount{}
 	// Check that user does not exist
 	if checkErr := retrievable.GetEntity(ctx, email, &checkLogin); checkErr == nil {
-		return u, ErrUsernameExists
+		return u, ERROR_UsernameExists
 	} else if checkErr != datastore.ErrNoSuchEntity && checkErr != nil {
 		return u, checkErr
 	}
@@ -103,7 +141,7 @@ func AUTH_GetUserIDFromSession(ctx context.Context, sessionID int64) (userID int
 func AUTH_GetSession(ctx context.Context, sessionID int64) (AUTH_Session, error) {
 	s := AUTH_Session{}
 	getErr := retrievable.GetEntity(ctx, sessionID, &s) // Get actual session from datastore
-	if getErr != nil { return AUTH_Session{}, ErrNotLoggedIn }
+	if getErr != nil { return AUTH_Session{}, ERROR_NotLoggedIn }
 	s.LastUsed = time.Now()
 	if _, err := retrievable.PlaceEntity(ctx, sessionID, &s); err != nil { return AUTH_Session{}, err }
 	return s, nil
@@ -111,10 +149,10 @@ func AUTH_GetSession(ctx context.Context, sessionID int64) (AUTH_Session, error)
 
 // Retrieves an AUTH_Session ID from the currently logged in user.
 func AUTH_GetSessionID(req *http.Request) (int64, error) {
-	sessionIDStr, err := GetCookieValue(req, "session")
-	if err != nil { return -1, ErrNotLoggedIn }
+	sessionIDStr, err := COOKIE_GetValue(req, "session")
+	if err != nil { return -1, ERROR_NotLoggedIn }
 	id, err := strconv.ParseInt(sessionIDStr, 10, 64) // Change cookie val into key
-	if err != nil { return -1, ErrInvalidLogin }
+	if err != nil { return -1, ERROR_InvalidLogin }
 	return id, nil
 }
 
@@ -154,18 +192,18 @@ func AUTH_LoginToWebsite(ctx Context,username,password string) (string, error) {
 	if err != nil { return "Login Information Is Incorrect", err }
 	sessionID, err := AUTH_CreateSessionID(ctx, userID)
 	if err != nil { return "Login error, try again later.", err }
-	err = MakeCookie(ctx.res, "session", strconv.FormatInt(sessionID, 10))
+	err = COOKIE_Make(ctx.res, "session", strconv.FormatInt(sessionID, 10))
 	return "Login error, try again later.",err
 }
 
 // Makes the currently active user log out.
 func AUTH_LogoutFromWebsite(ctx Context)(string, error){
-	sessionIDStr, err := GetCookieValue(ctx.req, "session")
+	sessionIDStr, err := COOKIE_GetValue(ctx.req, "session")
 	if err != nil { return "Must be logged in", err }
 	sessionVal, err := strconv.ParseInt(sessionIDStr, 10, 0)	
 	if err != nil { return "Bad cookie value", err }
 	err = retrievable.DeleteEntity(ctx, (&AUTH_Session{}).Key(ctx, sessionVal))
-	if err == nil { DeleteCookie(ctx.res, "session") }
+	if err == nil { COOKIE_Delete(ctx.res, "session") }
 	return "No such session found!", err
 }
 

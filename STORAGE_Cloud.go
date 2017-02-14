@@ -9,6 +9,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+const gcsBucket  = "csci150project.appspot.com"
+
 func AddFileToGCS(ctx context.Context, filename, contentType string, freader io.Reader) error {
 	client, clientErr := storage.NewClient(ctx)
 	log.Infof(ctx, "storage.newclient error: ", clientErr)

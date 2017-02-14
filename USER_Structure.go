@@ -50,7 +50,7 @@ func (u *User) toEncrypt() (*EncryptedUser, error) {
 		Avatar:    u.Avatar,
 		Bio:       u.Bio,
 	}
-	email, err := Encrypt([]byte(u.Email), encryptKey)
+	email, err := AUTH_Encrypt([]byte(u.Email), encryptKey)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (u *User) toEncrypt() (*EncryptedUser, error) {
 }
 
 func (u *User) fromEncrypt(e *EncryptedUser) error {
-	email, err := Decrypt(e.Email, encryptKey)
+	email, err := AUTH_Decrypt(e.Email, encryptKey)
 	if err != nil {
 		return err
 	}

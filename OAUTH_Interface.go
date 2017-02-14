@@ -12,7 +12,7 @@ import (
 // Logs the user in with an OAuth id.
 func OAuthLogin(req *http.Request, res http.ResponseWriter, id, first, last, redirect string) {
 	err := LoginFromOauth(res, req, id)
-	if err == ErrNoUser {
+	if err == ERROR_NoUser {
 		RegisterFromOauth(res, req, id, first, last)
 	}
 	redirect = strings.Replace(redirect, "%2f", "/", -1)
@@ -25,13 +25,13 @@ func LoginFromOauth(res http.ResponseWriter, req *http.Request, email string) er
 	l := LoginOauthAccount{}
 	err := retrievable.GetEntity(ctx, email, &l)
 	if err != nil {
-		return ErrNoUser
+		return ERROR_NoUser
 	}
 	sessID, err := AUTH_CreateSessionID(ctx, l.UserID)
 	if err != nil {
 		return err
 	}
-	err = MakeCookie(res, "session", strconv.FormatInt(sessID, 10))
+	err = COOKIE_Make(res, "session", strconv.FormatInt(sessID, 10))
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func RegisterFromOauth(res http.ResponseWriter, req *http.Request, email, first,
 	if err != nil {
 		return err
 	}
-	err = MakeCookie(res, "session", strconv.FormatInt(sessID, 10))
+	err = COOKIE_Make(res, "session", strconv.FormatInt(sessID, 10))
 	if err != nil {
 		return err
 	}

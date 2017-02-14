@@ -34,17 +34,17 @@ func AUTH_GET_Login(res http.ResponseWriter, req *http.Request, params httproute
 func AUTH_POST_Login(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	if !AUTH_ValidLogin(req.FormValue("email"), req.FormValue("password")) {
-		BackWithError(ctx, ErrInvalidLogin, "Invalid Login Information")
+		ERROR_Back(ctx, ERROR_InvalidLogin, "Invalid Login Information")
 	} else {
 		response, err := AUTH_LoginToWebsite(ctx,req.FormValue("email"), req.FormValue("password"))
-		if !BackWithError(ctx, err, response) { ctx.Redirect("/"+req.FormValue("redirect")) }
+		if !ERROR_Back(ctx, err, response) { ctx.Redirect("/"+req.FormValue("redirect")) }
 	}
 }
 
 func AUTH_GET_Logout(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	response,err := AUTH_LogoutFromWebsite(ctx)	
-	if !ErrorPage(ctx, response, err, http.StatusBadRequest) {  ctx.Redirect("/"+req.FormValue("redirect")) }
+	if !ERROR_Page(ctx, response, err, http.StatusBadRequest) {  ctx.Redirect("/"+req.FormValue("redirect")) }
 }
 
 func AUTH_GET_Register(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
@@ -68,5 +68,5 @@ func AUTH_POST_Register(res http.ResponseWriter, req *http.Request, params httpr
 		req.FormValue("first"),
 		req.FormValue("last"),
 	)
-	if !BackWithError(ctx, err, response) { AUTH_POST_Login(res, req, params) }
+	if !ERROR_Back(ctx, err, response) { AUTH_POST_Login(res, req, params) }
 }

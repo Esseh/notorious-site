@@ -1,47 +1,11 @@
 package main
 import (
-	"strings"
 	"errors"
-	"net/http"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine"
 	"strconv"
 	"github.com/Esseh/retrievable"
 	"google.golang.org/appengine/datastore"
 )
-
-
-type Context struct {
-	req *http.Request
-	res http.ResponseWriter
-	user *User
-	userException error
-	context.Context
-}
-
-func (ctx Context)AssertLoggedInFailed() bool {
-	if ctx.userException != nil {
-		path := strings.Replace(ctx.req.URL.Path[1:], "%2f", "/", -1)
-		http.Redirect(ctx.res, ctx.req, PATH_AUTH_Login+"?redirect="+path, http.StatusSeeOther)
-		return true
-	}
-	return false
-}
-
-func (ctx Context)Redirect(uri string){ http.Redirect(ctx.res, ctx.req, uri, http.StatusSeeOther) }
-
-func NewContext(res http.ResponseWriter, req *http.Request) Context{
-	user, err := AUTH_GetUserFromSession(req)
-	ctx := Context { 
-		req: req,
-		res: res,
-		user: user,
-		userException: err,
-	}
-	ctx.Context = appengine.NewContext(req)
-	return ctx
-}
-
+// Retrieves an existing note and it's content by it's id.
 func GetExistingNote(ctx Context,id string)(*Note,*Content,error){
 	RetrievedNote := &Note{}
 	RetrievedContent := &Content{}
@@ -53,6 +17,7 @@ func GetExistingNote(ctx Context,id string)(*Note,*Content,error){
 	return RetrievedNote,RetrievedContent,err
 }
 
+// Verifies that the currently logged in user is allowed to interact with the Note.
 func VerifyNotePermission(ctx Context, note *Note) bool {
 	redirect := strconv.FormatInt(note.OwnerID, 10)
 	if note.OwnerID != int64(ctx.user.IntID) && note.Protected {
@@ -62,6 +27,7 @@ func VerifyNotePermission(ctx Context, note *Note) bool {
 	return true
 }
 
+// Given a Content and Note it will construct instances of each, tie them together in the database and provide their keys.
 func CreateNewNote(ctx Context,NewContent Content,NewNote Note) (*datastore.Key,*datastore.Key,error) {
 	contentKey, err := retrievable.PlaceEntity(ctx, int64(0), &NewContent)
 	if err != nil { return contentKey,&datastore.Key{},err }
@@ -70,6 +36,7 @@ func CreateNewNote(ctx Context,NewContent Content,NewNote Note) (*datastore.Key,
 	return contentKey,noteKey,err
 }
 
+// Updates a note and its content based on the given id.
 func UpdateNoteContent(ctx Context,id string,UpdatedContent Content, UpdatedNote Note) error {
 	Note := Note{}
 	noteID, err := strconv.ParseInt(id, 10, 64); if err != nil { return err }
