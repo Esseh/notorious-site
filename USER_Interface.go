@@ -18,9 +18,7 @@ func getAvatarPath(userID int64) string {
 
 func UploadAvatar(ctx context.Context, userID int64, header *multipart.FileHeader, avatarReader io.ReadSeeker) error {
 	m, _, err := image.Decode(avatarReader)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	imageBounds := m.Bounds()
 	if imageBounds.Dy() > maxAvatarSize || imageBounds.Dx() > maxAvatarSize {
 		return ERROR_TooLarge
@@ -29,5 +27,5 @@ func UploadAvatar(ctx context.Context, userID int64, header *multipart.FileHeade
 		return err
 	}
 	filename := getAvatarPath(userID)
-	return AddFileToGCS(ctx, filename, header.Header["Content-Type"][0], avatarReader)
+	return CLOUD_AddFile(ctx, filename, header.Header["Content-Type"][0], avatarReader)
 }
