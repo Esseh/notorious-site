@@ -26,7 +26,7 @@ type Context struct {
 	// The output writer to the user's browser.
 	res http.ResponseWriter
 	// The currently logged in user.
-	user *User
+	user *USER_User
 	// Any problems that occured while logging in.
 	userException error
 	// transaction timing information.

@@ -63,7 +63,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					HeaderData
 					ErrorResponse, RedirectURL, Title, Notekey string
 					Content                                    template.HTML
-					User, Owner                                *User
+					User, Owner                                *USER_User
 				}{
 					HeaderData:    *MakeHeader(ctx),
 					RedirectURL:   req.FormValue("redirect"),

@@ -2,10 +2,9 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
-
+	"fmt"
 	"github.com/Esseh/retrievable"
 	"github.com/julienschmidt/httprouter"
 )
@@ -23,89 +22,70 @@ const (
 	PATH_USERS_ProfileView       = "/profile/:ID"
 )
 
-//===========================================================================
-// Profile
-//===========================================================================
-func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := NewContext(res,req)
-	if ctx.AssertLoggedInFailed() { return }
-	err := ServeTemplateWithParams(res, "profile-settings", struct {
-		HeaderData
-		ErrorResponseProfile string
-		User                 *User
-	}{
-		*MakeHeader(ctx),
-		req.FormValue("ErrorResponseProfile"),
-		ctx.user,
-	})
-	if err != nil {
-		fmt.Fprint(res, err)
-	}
-}
-
-// TODO: Implement
-func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, _ := AUTH_GetUserFromSession(req)
-	u.First = req.FormValue("first")
-	u.Last = req.FormValue("last")
-	u.Bio = req.FormValue("bio")
-	ctx := NewContext(res,req)
-	_, err := retrievable.PlaceEntity(ctx, u.IntID, u)
-	if ERROR_Page(ctx, "server error placing key", err, http.StatusBadRequest) {
-		return
-	}
-
-	http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(u.IntID), 10), http.StatusSeeOther)
-}
-
-// TODO: Implement
-func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	u, _ := AUTH_GetUserFromSession(req)
-	ctx := NewContext(res,req)
-
-	rdr, hdr, err := req.FormFile("avatar")
-	if ERROR_Page(ctx, "upload image thingy", err, http.StatusBadRequest) {
-		return
-	}
-	defer rdr.Close()
-	u.Avatar = true
-	err2 := UploadAvatar(ctx, int64(u.IntID), hdr, rdr)
-
-	if err2 != nil {
-		fmt.Fprint(res, err2)
-	}
-	_, err = retrievable.PlaceEntity(ctx, u.IntID, u)
-	if ERROR_Page(ctx, "server error placing key", err, http.StatusBadRequest) {
-		return
-	}
-	http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(u.IntID), 10), http.StatusSeeOther)
-}
-
-//===========================================================================
-// Profile View
-//===========================================================================
 func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := NewContext(res,req)
 	id, convErr := strconv.ParseInt(params.ByName("ID"), 10, 64)
-	if ERROR_Page(ctx, "Invalid ID", convErr, http.StatusBadRequest) {
-		return
+	if !ERROR_Page(ctx, "Invalid ID", convErr, http.StatusBadRequest) {
+		ci, getErr := AUTH_GetUserFromID(ctx, id)
+		if !ERROR_Page(ctx, "Not a valid user ID", getErr, http.StatusNotFound) {
+			notes, err := NOTES_GetAllNotes(ctx, id)
+			if !ERROR_Page(ctx, "Internal Server Error", err, http.StatusSeeOther) {
+				screen := struct {
+					HeaderData
+					Data     *USER_User
+					AllNotes []NOTES_NoteOutput
+				}{
+					*MakeHeader(ctx),
+					ci,
+					notes,
+				}
+				ServeTemplateWithParams(res, "user-profile", screen)
+			}
+		}
 	}
-	ci, getErr := AUTH_GetUserFromID(ctx, id)
-	if ERROR_Page(ctx, "Not a valid user ID", getErr, http.StatusNotFound) {
-		return
+}
+
+
+func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	ctx := NewContext(res,req)
+	if !ctx.AssertLoggedInFailed() {
+		ServeTemplateWithParams(res, "profile-settings", struct {
+			HeaderData
+			ErrorResponseProfile string
+			User                 *USER_User
+		}{
+			*MakeHeader(ctx),
+			req.FormValue("ErrorResponseProfile"),
+			ctx.user,
+		})
 	}
-	notes, err := NOTES_GetAllNotes(ctx, id)
-	if ERROR_Page(ctx, "Internal Server Error", err, http.StatusSeeOther) {
-		return
+}
+
+func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	user, _ := AUTH_GetUserFromSession(req)
+	user.First = req.FormValue("first")
+	user.Last = req.FormValue("last")
+	user.Bio = req.FormValue("bio")
+	ctx := NewContext(res,req)
+	_, err := retrievable.PlaceEntity(ctx, user.IntID, user)
+	if !ERROR_Page(ctx, "server error placing key", err, http.StatusBadRequest) {
+		ctx.Redirect("/profile/"+strconv.FormatInt(int64(user.IntID), 10))
 	}
-	screen := struct {
-		HeaderData
-		Data     *User
-		AllNotes []NOTES_NoteOutput
-	}{
-		*MakeHeader(ctx),
-		ci,
-		notes,
+}
+
+func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	user, _ := AUTH_GetUserFromSession(req)
+	ctx := NewContext(res,req)
+	rdr, hdr, err := req.FormFile("avatar")
+	if !ERROR_Page(ctx, "upload image thingy", err, http.StatusBadRequest) {
+		defer rdr.Close()
+		user.Avatar = true
+		err2 := USER_UploadAvatar(ctx, int64(user.IntID), hdr, rdr)
+		if err2 != nil { fmt.Fprint(res, err2) } else {
+			_, err = retrievable.PlaceEntity(ctx, user.IntID, user)
+			if !ERROR_Page(ctx, "server error placing key", err, http.StatusBadRequest) {
+				http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(user.IntID), 10), http.StatusSeeOther)
+			}
+		}
 	}
-	ServeTemplateWithParams(res, "user-profile", screen)
 }

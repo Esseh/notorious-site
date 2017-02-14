@@ -49,7 +49,7 @@ func ServeTemplateWithParams(res http.ResponseWriter, templateName string, param
 // Present in most template executions. (Unless it's an internal it should be assumed to be used.)
 type HeaderData struct {
 	Ctx          context.Context
-	User         *User
+	User         *USER_User
 	CurrentPath  string
 }
 

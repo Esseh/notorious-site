@@ -12,11 +12,13 @@ import (
 
 const maxAvatarSize = 500
 
+// Generates the Avatar Path for a URL
 func getAvatarPath(userID int64) string {
 	return "users/" + strconv.FormatInt(userID, 10) + "/avatar"
 }
 
-func UploadAvatar(ctx context.Context, userID int64, header *multipart.FileHeader, avatarReader io.ReadSeeker) error {
+// Uploads an avatar for a user into the cloud.
+func USER_UploadAvatar(ctx context.Context, userID int64, header *multipart.FileHeader, avatarReader io.ReadSeeker) error {
 	m, _, err := image.Decode(avatarReader)
 	if err != nil { return err }
 	imageBounds := m.Bounds()

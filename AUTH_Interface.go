@@ -67,7 +67,7 @@ func AUTH_GetUserIDFromLogin(ctx Context, email, password string) (int64, error)
 }
 
 // Utilizing an AUTH_User and username/password information it creates a database entry for their AUTH_LoginLocalAccount.
-func AUTH_CreateUserFromLogin(ctx Context, email, password string, u *User) (*User, error) {
+func AUTH_CreateUserFromLogin(ctx Context, email, password string, u *USER_User) (*USER_User, error) {
 	checkLogin := AUTH_LoginLocalAccount{}
 	// Check that user does not exist
 	if checkErr := retrievable.GetEntity(ctx, email, &checkLogin); checkErr == nil {
@@ -157,9 +157,9 @@ func AUTH_GetSessionID(req *http.Request) (int64, error) {
 }
 
 // Retrieves an AUTH_User from the currently logged in user.
-func AUTH_GetUserFromSession(req *http.Request) (*User, error) {
+func AUTH_GetUserFromSession(req *http.Request) (*USER_User, error) {
 	userID, err := AUTH_GetUserIDFromRequest(req)
-	if err != nil { return &User{}, err }
+	if err != nil { return &USER_User{}, err }
 	ctx := appengine.NewContext(req)
 	return AUTH_GetUserFromID(ctx, userID)
 }
@@ -175,8 +175,8 @@ func AUTH_GetUserIDFromRequest(req *http.Request) (int64, error) {
 }
 
 // Retireves an AUTH_User from it's respective ID.
-func AUTH_GetUserFromID(ctx context.Context, userID int64) (*User, error) {
-	u := &User{}
+func AUTH_GetUserFromID(ctx context.Context, userID int64) (*USER_User, error) {
+	u := &USER_User{}
 	getErr := retrievable.GetEntity(ctx, retrievable.IntID(userID), u)
 	return u, getErr
 }
@@ -214,7 +214,7 @@ func AUTH_LogoutFromWebsite(ctx Context)(string, error){
 //	firstName
 //	lastName
 func AUTH_RegisterNewUser(ctx Context, username, password, confirmPassword, firstName, lastName string)(string,error){
-	newUser := &User{ // Make the New User
+	newUser := &USER_User{ // Make the New User
 		Email:    strings.ToLower(username),
 		First:    firstName,
 		Last:     lastName,

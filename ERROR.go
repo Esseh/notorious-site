@@ -40,7 +40,7 @@ func ERROR_Page(ctx Context, ErrorTitle string, e error, errCode int) bool {
 	if e != nil {
 		log.Errorf(ctx, "%s ---- %v\n", ErrorTitle, e)
 		if ctx.user == nil {
-			ctx.user = &User{}
+			ctx.user = &USER_User{}
 		}
 		args := &struct {
 			Header    HeaderData

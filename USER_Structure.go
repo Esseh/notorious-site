@@ -15,15 +15,20 @@ var (
 )
 
 type (
-	User struct {
+	// Represents an individual user.
+	USER_User struct {
+		// First and Last Name
 		First, Last       string
 		Email             string
+		// Whether they have an active avatar or not.
 		Avatar            bool `datastore:",noindex"`
+		// Biography.
 		Bio               string
+		// ID referred to itself.
 		retrievable.IntID `datastore:"-" json:"-"`
 	}
-	// RecentlyViewed struct{ CID []int64 } // Holds recently viewed course information.
-	EncryptedUser struct {
+	// An encrypted user.
+	USER_EncryptedUser struct {
 		First, Last string
 		Email       string
 		Avatar      bool `datastore:",noindex"`
@@ -31,38 +36,31 @@ type (
 	}
 )
 
-// int64 Keys
-func (u *User) Key(ctx context.Context, key interface{}) *datastore.Key {
+func (u *USER_User) Key(ctx context.Context, key interface{}) *datastore.Key {
 	if v, ok := key.(retrievable.IntID); ok {
 		return datastore.NewKey(ctx, UsersTable, "", int64(v), nil)
 	}
 	return datastore.NewKey(ctx, UsersTable, "", key.(int64), nil)
 }
 
-// func (r *RecentlyViewed) Key(ctx context.Context, key interface{}) *datastore.Key {
-// 	return datastore.NewKey(ctx, RecentlyViewedTable, "", key.(int64), nil)
-// }
-
-func (u *User) toEncrypt() (*EncryptedUser, error) {
-	e := &EncryptedUser{
+// Converts user to an encrypted user.
+func (u *USER_User) toEncrypt() (*USER_EncryptedUser, error) {
+	e := &USER_EncryptedUser{
 		First:     u.First,
 		Last:      u.Last,
 		Avatar:    u.Avatar,
 		Bio:       u.Bio,
 	}
 	email, err := AUTH_Encrypt([]byte(u.Email), encryptKey)
-	if err != nil {
-		return nil, err
-	}
+	if err != nil { return nil, err }
 	e.Email = email
 	return e, nil
 }
 
-func (u *User) fromEncrypt(e *EncryptedUser) error {
+// Converts encrypted user to normal user.
+func (u *USER_User) fromEncrypt(e *USER_EncryptedUser) error {
 	email, err := AUTH_Decrypt(e.Email, encryptKey)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	u.First = e.First
 	u.Last = e.Last
 	u.Email = string(email)
@@ -71,34 +69,17 @@ func (u *User) fromEncrypt(e *EncryptedUser) error {
 	return nil
 }
 
-func (u *User) Serialize() []byte {
+// User -> JSON
+func (u *USER_User) Serialize() []byte {
 	data, _ := u.toEncrypt()
 	ret, _ := json.Marshal(&data)
 	return ret
 }
-
-func (u *User) Unserialize(data []byte) error {
-	e := &EncryptedUser{}
+// JSON -> User
+func (u *USER_User) Unserialize(data []byte) error {
+	e := &USER_EncryptedUser{}
 	err := json.Unmarshal(data, e)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	return u.fromEncrypt(e)
 }
 
-func (u *User) Save() ([]datastore.Property, error) {
-	e, err := u.toEncrypt()
-	if err != nil {
-		return nil, err
-	}
-	return datastore.SaveStruct(e)
-}
-
-func (u *User) Load(ps []datastore.Property) error {
-	e := &EncryptedUser{}
-	err := datastore.LoadStruct(e, ps)
-	if err != nil {
-		return err
-	}
-	return u.fromEncrypt(e)
-}

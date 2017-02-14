@@ -38,7 +38,7 @@ func RegisterFromOauth(res http.ResponseWriter, req *http.Request, email, first,
 
 	// Check that user does not exist
 	if checkErr := retrievable.GetEntity(ctx, email, &checkLogin); checkErr == nil { return checkErr }
-	u := User{
+	u := USER_User{
 		Email: email,
 		First: first,
 		Last:  last,
