@@ -14,7 +14,7 @@
 <script src="//cdn.quilljs.com/1.1.5/quill.core.js"></script>
 <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
 </head>
-{{ template "header" .}}
+{{ template "header" .HeaderData}}
 <body>
 <div id="edit"> <a href="/edit/{{.Notekey}}">Edit</a><br>
 <a href = "/profile/{{.Owner.IntID}}"> Note Owned by: {{.Owner.First}} {{.Owner.Last}} </a>

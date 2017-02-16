@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
+	"github.com/Esseh/notorious-dev/AUTH"
+	"github.com/Esseh/notorious-dev/PATHS"
 	"github.com/Esseh/goauth"
 )
 
@@ -10,18 +12,11 @@ func init(){
 	goauth.GlobalSettings.ClientType = "appengine"
 }
 
-const(
-	PATH_AUTH_OAUTH_GITHUB_Recieve  = "/login/github/oauth/recieve"
-	PATH_AUTH_OAUTH_GITHUB_Send     = "/login/github/oauth/send"
-	PATH_AUTH_OAUTH_DROPBOX_Send    = "/login/dropbox/oauth/send"
-	PATH_AUTH_OAUTH_DROPBOX_Recieve = "/login/dropbox/oauth/recieve"
-)
-
 func INIT_OAUTH_Handlers(r *httprouter.Router){
-	r.GET(PATH_AUTH_OAUTH_GITHUB_Send, AUTH_OAUTH_GITHUB_Send)
-	r.GET(PATH_AUTH_OAUTH_GITHUB_Recieve, AUTH_OAUTH_GITHUB_Recieve)
-	r.GET(PATH_AUTH_OAUTH_DROPBOX_Send, AUTH_OAUTH_DROPBOX_Send)
-	r.GET(PATH_AUTH_OAUTH_DROPBOX_Recieve, AUTH_OAUTH_DROPBOX_Recieve)
+	r.GET(PATHS.AUTH_OAUTH_GITHUB_Send, AUTH_OAUTH_GITHUB_Send)
+	r.GET(PATHS.AUTH_OAUTH_GITHUB_Recieve, AUTH_OAUTH_GITHUB_Recieve)
+	r.GET(PATHS.AUTH_OAUTH_DROPBOX_Send, AUTH_OAUTH_DROPBOX_Send)
+	r.GET(PATHS.AUTH_OAUTH_DROPBOX_Recieve, AUTH_OAUTH_DROPBOX_Recieve)
 }
 
 const(
@@ -43,20 +38,20 @@ func AUTH_OAUTH_GITHUB_Recieve(res http.ResponseWriter, req *http.Request, param
 	var token goauth.GitHubToken
 	err := goauth.Recieve(res, req,"http://localhost:8080/login/github/oauth/recieve",GITHUB_CLIENTID,GITHUB_SECRETID,&token)
 	if err != nil { 
-		http.Redirect(res,req,PATH_AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time",http.StatusSeeOther)
+		http.Redirect(res,req,PATHS.AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time",http.StatusSeeOther)
 		return
 	}
 	email, err  := token.Email(req)
 	if err != nil { 
-		http.Redirect(res,req,PATH_AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time",http.StatusSeeOther)
+		http.Redirect(res,req,PATHS.AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time",http.StatusSeeOther)
 		return
 	}
 	info,  err 	:= token.AccountInfo(req)
 	if err != nil { 
-		http.Redirect(res,req,PATH_AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time",http.StatusSeeOther)
+		http.Redirect(res,req,PATHS.AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time",http.StatusSeeOther)
 		return
 	}
-	OAuthLogin(req,res,email.Email,info.Login,"",token.State)
+	AUTH.OAuthLogin(req,res,email.Email,info.Login,"",token.State)
 }
 
 func AUTH_OAUTH_DROPBOX_Send(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -68,13 +63,13 @@ func AUTH_OAUTH_DROPBOX_Recieve(res http.ResponseWriter, req *http.Request, _ ht
 	var token goauth.DropboxToken
 	err := goauth.Recieve(res, req, "http://localhost:8080/login/dropbox/oauth/recieve", DROPBOX_Appkey, DROPBOX_Appsecret,&token)
 	if err != nil {
-		http.Redirect(res,req,PATH_AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time (1)",http.StatusSeeOther)
+		http.Redirect(res,req,PATHS.AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time (1)",http.StatusSeeOther)
 		return	
 	}
 	info,err := token.AccountInfo(req)
 	if err != nil {
-		http.Redirect(res,req,PATH_AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time (2)",http.StatusSeeOther)
+		http.Redirect(res,req,PATHS.AUTH_Login+"/?ErrorResponse=Unable to Fetch Credentials at This Time (2)",http.StatusSeeOther)
 		return		
 	}
-	OAuthLogin(req,res,info.Email,info.NameDetails.GivenName,info.NameDetails.Surname,token.State)
+	AUTH.OAuthLogin(req,res,info.Email,info.NameDetails.GivenName,info.NameDetails.Surname,token.State)
 }

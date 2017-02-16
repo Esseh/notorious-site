@@ -1,28 +1,29 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"github.com/julienschmidt/httprouter"
+	"github.com/Esseh/notorious-dev/AUTH"
+	"github.com/Esseh/notorious-dev/CORE"
+	"github.com/Esseh/notorious-dev/CONTEXT"
+	"github.com/Esseh/notorious-dev/PATHS"
+
 )
 
-const (
-	PATH_AUTH_Login          = "/login"
-	PATH_AUTH_Logout         = "/logout"
-	PATH_AUTH_Register       = "/register"
-)
 
 func INIT_AUTH_HANDLERS(r *httprouter.Router) {
-	r.GET(PATH_AUTH_Logout, AUTH_GET_Logout)                   
-	r.GET(PATH_AUTH_Login, AUTH_GET_Login)                     
-	r.POST(PATH_AUTH_Login, AUTH_POST_Login)                   
-	r.GET(PATH_AUTH_Register, AUTH_GET_Register)               
-	r.POST(PATH_AUTH_Register, AUTH_POST_Register)             
+	r.GET(PATHS.AUTH_Logout, AUTH_GET_Logout)                   
+	r.GET(PATHS.AUTH_Login, AUTH_GET_Login)                     
+	r.POST(PATHS.AUTH_Login, AUTH_POST_Login)                   
+	r.GET(PATHS.AUTH_Register, AUTH_GET_Register)               
+	r.POST(PATHS.AUTH_Register, AUTH_POST_Register)             
 }
 
 func AUTH_GET_Login(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := NewContext(res,req)
-	ServeTemplateWithParams(res, "login", struct {
-		HeaderData
+	ctx := CONTEXT.NewContext(res,req)
+	CORE.ServeTemplateWithParams(res, "login", struct {
+		HeaderData	CONTEXT.HeaderData
 		ErrorResponse, RedirectURL string
 	}{
 		HeaderData:    *MakeHeader(ctx),
@@ -32,25 +33,25 @@ func AUTH_GET_Login(res http.ResponseWriter, req *http.Request, params httproute
 }
 
 func AUTH_POST_Login(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := NewContext(res,req)
-	if !AUTH_ValidLogin(req.FormValue("email"), req.FormValue("password")) {
-		ERROR_Back(ctx, ERROR_InvalidLogin, "Invalid Login Information")
+	ctx := CONTEXT.NewContext(res,req)
+	if !CORE.ValidLogin(req.FormValue("email"), req.FormValue("password")) {
+		ctx.BackWithError(errors.New("Not Logged In"), "Invalid Login Information")
 	} else {
-		response, err := AUTH_LoginToWebsite(ctx,req.FormValue("email"), req.FormValue("password"))
-		if !ERROR_Back(ctx, err, response) { ctx.Redirect("/"+req.FormValue("redirect")) }
+		response, err := AUTH.LoginToWebsite(ctx,req.FormValue("email"), req.FormValue("password"))
+		if !ctx.BackWithError(err, response) { ctx.Redirect("/"+req.FormValue("redirect")) }
 	}
 }
 
 func AUTH_GET_Logout(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := NewContext(res,req)
-	response,err := AUTH_LogoutFromWebsite(ctx)	
-	if !ERROR_Page(ctx, response, err, http.StatusBadRequest) {  ctx.Redirect("/"+req.FormValue("redirect")) }
+	ctx := CONTEXT.NewContext(res,req)
+	response,err := AUTH.LogoutFromWebsite(ctx)	
+	if !ctx.ErrorPage(response, err, http.StatusBadRequest) {  ctx.Redirect("/"+req.FormValue("redirect")) }
 }
 
 func AUTH_GET_Register(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := NewContext(res,req)
-	ServeTemplateWithParams(res, "register", struct {
-		HeaderData
+	ctx := CONTEXT.NewContext(res,req)
+	CORE.ServeTemplateWithParams(res, "register", struct {
+		HeaderData CONTEXT.HeaderData
 		ErrorResponse, RedirectURL string
 	}{
 		HeaderData:    *MakeHeader(ctx),
@@ -59,8 +60,8 @@ func AUTH_GET_Register(res http.ResponseWriter, req *http.Request, params httpro
 	})
 }
 func AUTH_POST_Register(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ctx := NewContext(res,req)
-	response, err := AUTH_RegisterNewUser(
+	ctx := CONTEXT.NewContext(res,req)
+	response, err := AUTH.RegisterNewUser(
 		ctx,
 		req.FormValue("email"),
 		req.FormValue("password"),
@@ -68,5 +69,5 @@ func AUTH_POST_Register(res http.ResponseWriter, req *http.Request, params httpr
 		req.FormValue("first"),
 		req.FormValue("last"),
 	)
-	if !ERROR_Back(ctx, err, response) { AUTH_POST_Login(res, req, params) }
+	if !ctx.BackWithError(err, response) { AUTH_POST_Login(res, req, params) }
 }

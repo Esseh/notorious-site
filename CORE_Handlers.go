@@ -3,9 +3,10 @@ package main
 import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
+	"github.com/Esseh/notorious-dev/CONTEXT"
+	"github.com/Esseh/notorious-dev/CORE"
 )
 
-const DomainPath = "http://localhost:8080/"
 
 // Multiplexer Function for CORE
 func Handle_CORE(r *httprouter.Router) {
@@ -14,8 +15,8 @@ func Handle_CORE(r *httprouter.Router) {
 
 // Serves the index page.
 func index(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	ctx := NewContext(res,req)
-	ServeTemplateWithParams(res, "index", struct { HeaderData }{ *MakeHeader(ctx), })
+	ctx := CONTEXT.NewContext(res,req)
+	CORE.ServeTemplateWithParams(res, "index", struct { CONTEXT.HeaderData }{ *MakeHeader(ctx), })
 }
 
 func init() {

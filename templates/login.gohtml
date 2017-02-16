@@ -9,7 +9,7 @@
 </head>
 
 <body>
-{{ template "header"}}
+{{ template "header" .HeaderData}}
 
 <div id="wrapper">
   <div id="main">
@@ -34,7 +34,7 @@
             <input type="hidden" id="redirect" name="redirect" value="{{.RedirectURL}}">
             <ul class="actions">
               <li><input type="submit" value="Login"></li>
-              <li><a href="/register?redirect={{.CurrentPath}}" class="button">Sign up</a></li>
+              <li><a href="/register?redirect={{.HeaderData.CurrentPath}}" class="button">Sign up</a></li>
             </ul>
         </form>
       </div>
