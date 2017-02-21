@@ -8,6 +8,7 @@ import (
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/USERS"
+	"github.com/Esseh/notorious-dev/NOTES"	
 	"github.com/Esseh/retrievable"
 	humanize "github.com/dustin/go-humanize" // russross markdown parser
 	appcontext "golang.org/x/net/context"
@@ -30,6 +31,7 @@ func init() {
 		"getDate":       CORE.GetDate,
 		"toInt":         CORE.ToInt,
 		"getMod":        GetMod,
+		"canEditNote":	 NOTES.CanEditNote,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
