@@ -29,33 +29,35 @@ func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		// TODO: Handle Two Separate values for PublicallyViewable/PublicallyEditables
-		protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
+		publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {		
-			_, noteKey, err := NOTES.CreateNewNote(ctx,
-				NOTES.Content{
-					Title:   req.FormValue("title"),
-					Content: req.FormValue("note"),
-				},
-				NOTES.Note{
-					OwnerID:   int64(ctx.User.IntID),
-					PublicallyViewable: protected,		// TODO: HAndle Two Separate values for PublicallyViewable/PublicallyEditables
-					PublicallyEditable: protected,		
-				},
-			)
-			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
-				ctx.Redirect("/view/"+strconv.FormatInt(noteKey.IntID(), 10))
+			publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {	
+				_, noteKey, err := NOTES.CreateNewNote(ctx,
+					NOTES.Content{
+						Title:   req.FormValue("title"),
+						Content: req.FormValue("note"),
+					},
+					NOTES.Note{
+						OwnerID:   int64(ctx.User.IntID),
+						PublicallyViewable: publicallyViewable,
+						PublicallyEditable: publicallyEditable,		
+					},
+				)
+				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
+					ctx.Redirect("/view/"+strconv.FormatInt(noteKey.IntID(), 10))
+				}
 			}
 		}
 	}
 }
 
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	// TODO: Should kick out user if they are not allowed to view it.
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
 		if !ctx.ErrorPage("Internal Server Error (1)", err, http.StatusSeeOther) {
+			if !NOTES.CanViewNote(ViewNote,ctx.User){ ctx.Redirect("/"); return }
 			owner, err := GetUserFromID(ctx, ViewNote.OwnerID)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 				NoteBody := template.HTML(CORE.EscapeString(ViewContent.Content))
@@ -111,21 +113,23 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		// TODO: Handle publically viewable / publically editable differently.
-		protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
+		publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-viewable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
-			err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
-				NOTES.Content{
-					Content: CORE.EscapeString(req.FormValue("note")),
-					Title: req.FormValue("title"),
-				},
-				NOTES.Note{
-					PublicallyEditable: protbool,		// TODO: These should be handled separately based on the GET
-					PublicallyViewable: protbool,
-				},
-			)
-			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
-				ctx.Redirect("/view/"+req.FormValue("notekey"))
+			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
+				err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
+					NOTES.Content{
+						Content: CORE.EscapeString(req.FormValue("note")),
+						Title: req.FormValue("title"),
+					},
+					NOTES.Note{
+						PublicallyEditable: publicallyEditable,
+						PublicallyViewable: publicallyViewable,
+					},
+				)
+				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
+					ctx.Redirect("/view/"+req.FormValue("notekey"))
+				}
 			}
 		}
 	}
