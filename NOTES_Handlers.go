@@ -29,6 +29,7 @@ func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
+		// TODO: Handle Two Separate values for PublicallyViewable/PublicallyEditables
 		protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {		
 			_, noteKey, err := NOTES.CreateNewNote(ctx,
@@ -38,7 +39,8 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 				},
 				NOTES.Note{
 					OwnerID:   int64(ctx.User.IntID),
-					Protected: protected,
+					PublicallyViewable: protected,		// TODO: HAndle Two Separate values for PublicallyViewable/PublicallyEditables
+					PublicallyEditable: protected,		
 				},
 			)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
@@ -49,6 +51,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 }
 
 func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	// TODO: Should kick out user if they are not allowed to view it.
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
@@ -83,7 +86,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 	if !ctx.AssertLoggedInFailed() { 
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
 		if !ctx.ErrorPage("Internal Server Error (1)", err, http.StatusSeeOther) {
-			validated := NOTES.VerifyNotePermission(ctx, ViewNote)
+			validated := NOTES.CanEditNote(ViewNote,ctx.User)
 			if validated {
 				Body := template.HTML(ViewContent.Content)
 				CORE.ServeTemplateWithParams(res, "editnote", struct {
@@ -108,6 +111,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
+		// TODO: Handle publically viewable / publically editable differently.
 		protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
 			err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
@@ -116,7 +120,8 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 					Title: req.FormValue("title"),
 				},
 				NOTES.Note{
-					Protected: protbool,
+					PublicallyEditable: protbool,		// TODO: These should be handled separately based on the GET
+					PublicallyViewable: protbool,
 				},
 			)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
