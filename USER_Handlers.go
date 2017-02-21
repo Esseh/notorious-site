@@ -25,7 +25,7 @@ func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params ht
 	ctx := CONTEXT.NewContext(res,req)
 	id, convErr := strconv.ParseInt(params.ByName("ID"), 10, 64)
 	if !ctx.ErrorPage("Invalid ID", convErr, http.StatusBadRequest) {
-		ci, getErr := USERS.GetUserFromID(ctx, id)
+		ci, getErr := GetUserFromID(ctx, id)
 		if !ctx.ErrorPage("Not a valid user ID", getErr, http.StatusNotFound) {
 			notes, err := NOTES.GetAllNotes(ctx, id)
 			if !ctx.ErrorPage("Internal Server Error", err, http.StatusSeeOther) {
@@ -61,11 +61,11 @@ func USERS_GET_ProfileEdit(res http.ResponseWriter, req *http.Request, params ht
 }
 
 func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	user, _ := USERS.GetUserFromSession(req)
+	ctx := CONTEXT.NewContext(res,req)
+	user, _ := USERS.GetUserFromSession(ctx,req)
 	user.First = req.FormValue("first")
 	user.Last = req.FormValue("last")
 	user.Bio = req.FormValue("bio")
-	ctx := CONTEXT.NewContext(res,req)
 	_, err := retrievable.PlaceEntity(ctx, user.IntID, user)
 	if !ctx.ErrorPage("server error placing key", err, http.StatusBadRequest) {
 		ctx.Redirect("/profile/"+strconv.FormatInt(int64(user.IntID), 10))
@@ -73,8 +73,8 @@ func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params h
 }
 
 func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	user, _ := USERS.GetUserFromSession(req)
 	ctx := CONTEXT.NewContext(res,req)
+	user, _ := USERS.GetUserFromSession(ctx,req)
 	rdr, hdr, err := req.FormFile("avatar")
 	if !ctx.ErrorPage("upload image thingy", err, http.StatusBadRequest) {
 		defer rdr.Close()

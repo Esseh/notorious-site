@@ -53,7 +53,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 	if !ctx.AssertLoggedInFailed() {
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
 		if !ctx.ErrorPage("Internal Server Error (1)", err, http.StatusSeeOther) {
-			owner, err := USERS.GetUserFromID(ctx, ViewNote.OwnerID)
+			owner, err := GetUserFromID(ctx, ViewNote.OwnerID)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 				NoteBody := template.HTML(CORE.EscapeString(ViewContent.Content))
 				CORE.ServeTemplateWithParams(res, "viewNote", struct {

@@ -3,6 +3,8 @@ package main
 import (
 	"html/template"
 	humanize "github.com/dustin/go-humanize" // russross markdown parser
+	appcontext "golang.org/x/net/context"
+	"github.com/Esseh/retrievable"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
@@ -15,7 +17,7 @@ func init() {
 	// Tie functions into template here with ... "functionName":theFunction,
 	funcMap := template.FuncMap{
 		"getAvatarURL":  CORE.GetAvatarURL,
-		"getUser":       USERS.GetUserFromID,
+		"getUser":       GetUserFromID,
 		"humanize":      humanize.Time,
 		"humanizeSize":  humanize.Bytes,
 		"monthfromtime": CORE.MonthFromTime,
@@ -33,6 +35,14 @@ func init() {
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
 
+}
+
+func GetUserFromID(ctx appcontext.Context, id int64)(*USERS.User,error){
+	owner := &USERS.User{}
+	err := retrievable.GetEntity(ctx,id,owner)			
+	if err != nil { return &USERS.User{}, err } else {
+		return owner, nil
+	}
 }
 
 // Constructs the header.
