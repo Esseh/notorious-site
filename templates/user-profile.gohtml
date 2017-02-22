@@ -62,12 +62,8 @@
 						<span id="title">{{$e.Content.Title}}</span>
 						<div id="note-selections">
 						<a href="/view/{{$e.ID}}" class="note-select">View</a>
-						{{ if (and ($u.Email) (ne $e.Data.Protected true) ) }}
-						<a href="/edit/{{$e.ID}}" class="note-select">Edit</a>
-						{{else}}
-						{{ if (eq $d.IntID $u.IntID)}}
-						<a href="/edit/{{$e.ID}}" class="note-select">Edit</a>
-						{{end}}
+						{{ if (canEditNote $e.Data $u) }}
+							<a href="/edit/{{$e.ID}}" class="note-select">Edit</a>
 						{{end}}
 						</div>
 						</label>

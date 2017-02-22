@@ -29,9 +29,9 @@ func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+		publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publicallyeditable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {		
-			publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+			publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publicallyeditable"))
 			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {	
 				_, noteKey, err := NOTES.CreateNewNote(ctx,
 					NOTES.Content{
@@ -113,9 +113,9 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-viewable"))
+		publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publicallyviewable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
-			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publicallyeditable"))
 			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
 				err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
 					NOTES.Content{

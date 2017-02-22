@@ -59,7 +59,10 @@
 
 <div class="row">
 	<input type="button" value = "Save Note" id = "clickMe"></input>
-<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
+<p><br>
+ <input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label>
+ <input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label>
+</p>
 </div>
 
 </div>
@@ -70,11 +73,16 @@
 
 <!-- Initialize Quill editor -->
 <script>
-
-var checkedValue = document.getElementById('publiclyeditable').checked;
-var strchecked = checkedValue.toString();
-
-document.getElementById("clickMe").onclick = function () { post('/new',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML, protection: strchecked,}) };
+publicallyeditable: document.getElementById('publiclyviewable').checked = true;
+publicallyeditable: document.getElementById('publiclyeditable').checked = true;
+document.getElementById("clickMe").onclick = function () { 
+	post('/new',{
+		title: document.getElementById("title").value ,
+		note: editor.container.firstChild.innerHTML, 
+		publicallyeditable: document.getElementById('publiclyeditable').checked.toString(),
+		publicallyviewable: document.getElementById('publiclyviewable').checked.toString(),
+		}); 
+	};
 
 
 
