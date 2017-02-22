@@ -59,7 +59,7 @@
 
 <div class="row">
 	<input type="button" value = "Save Note" id = "clickMe"></input>
-<p><br>
+<p {{if (ne .NoteData.OwnerID (toInt .HeaderData.User.IntID))}}hidden{{end}}><br>
 	<input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label>
 	<input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label>
 </p>
