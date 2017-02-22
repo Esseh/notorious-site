@@ -61,6 +61,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					ErrorResponse, RedirectURL, Title, Notekey string
 					Content                                    template.HTML
 					User, Owner                                *USERS.User
+					NoteData								   *NOTES.Note
 				}{
 					HeaderData:    *MakeHeader(ctx),
 					RedirectURL:   req.FormValue("redirect"),
@@ -70,6 +71,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					Content:       NoteBody,
 					User:          ctx.User,
 					Owner:         owner,
+					NoteData:	   ViewNote,
 				})
 			}
 		}
@@ -88,6 +90,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 					HeaderData CONTEXT.HeaderData
 					ErrorResponse, RedirectURL, Title, Notekey string
 					Content                                    template.HTML
+					NoteData								   *NOTES.Note
 				}{
 					HeaderData:    *MakeHeader(ctx),
 					RedirectURL:   req.FormValue("redirect"),
@@ -95,6 +98,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 					Title:         ViewContent.Title,
 					Notekey:       params.ByName("ID"),
 					Content:       Body,
+					NoteData:	   ViewNote,
 				})
 			}
 		}

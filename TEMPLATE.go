@@ -29,12 +29,16 @@ func init() {
 		"addCtx":        CORE.AddCtx,
 		"getDate":       CORE.GetDate,
 		"toInt":		 CORE.ToInt,
+		"getMod":		 GetMod,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
+}
 
+func GetMod(a int64,b int64)int64{
+ return a % b
 }
 
 func GetUserFromID(ctx appcontext.Context, id int64)(*USERS.User,error){
