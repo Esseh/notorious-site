@@ -113,9 +113,9 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publicallyviewable"))
+		publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publiclyviewable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
-			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publicallyeditable"))
+			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publiclyeditable"))
 			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
 				err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
 					NOTES.Content{

@@ -56,19 +56,20 @@
 						{{ $d := .Data}}
 						{{ $u := .User}}
 						{{range $i, $e := .AllNotes}}
-						<div class="note-card">
-						<label id=note-box>
-						<a href="/view/{{$e.ID}}" class="icon fa-file-o"></a>
-						<span id="title">{{$e.Content.Title}}</span>
-						<div id="note-selections">
-						<a href="/view/{{$e.ID}}" class="note-select">View</a>
-						{{ if (canEditNote $e.Data $u) }}
-							<a href="/edit/{{$e.ID}}" class="note-select">Edit</a>
+						{{if (canViewNote $e.Data $u)}}
+							<div class="note-card">
+							<label id=note-box>
+							<a href="/view/{{$e.ID}}" class="icon fa-file-o"></a>
+							<span id="title">{{$e.Content.Title}}</span>
+							<div id="note-selections">
+							<a href="/view/{{$e.ID}}" class="note-select">View</a>
+							{{ if (canEditNote $e.Data $u) }}
+								<a href="/edit/{{$e.ID}}" class="note-select">Edit</a>
+							{{end}}
+							</div>
+							</label>
+							</div>
 						{{end}}
-						</div>
-						</label>
-						</div>
-
 						{{end}}
 					</div>
 
