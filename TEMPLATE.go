@@ -2,16 +2,16 @@ package main
 
 import (
 	"html/template"
-	humanize "github.com/dustin/go-humanize" // russross markdown parser
-	appcontext "golang.org/x/net/context"
-	"github.com/Esseh/retrievable"
+	"math/rand"
+
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/USERS"
+	"github.com/Esseh/retrievable"
+	humanize "github.com/dustin/go-humanize" // russross markdown parser
+	appcontext "golang.org/x/net/context"
 )
-
-
 
 func init() {
 	// Tie functions into template here with ... "functionName":theFunction,
@@ -28,8 +28,8 @@ func init() {
 		"inc":           CORE.Inc,
 		"addCtx":        CORE.AddCtx,
 		"getDate":       CORE.GetDate,
-		"toInt":		 CORE.ToInt,
-		"getMod":		 GetMod,
+		"toInt":         CORE.ToInt,
+		"getMod":        GetMod,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
@@ -37,14 +37,17 @@ func init() {
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
 }
 
-func GetMod(a int64,b int64)int64{
- return a % b
+func GetMod(a int64) int64 {
+	rand.Seed(a)
+	return int64(rand.Uint32()) % 10
 }
 
-func GetUserFromID(ctx appcontext.Context, id int64)(*USERS.User,error){
+func GetUserFromID(ctx appcontext.Context, id int64) (*USERS.User, error) {
 	owner := &USERS.User{}
-	err := retrievable.GetEntity(ctx,id,owner)			
-	if err != nil { return &USERS.User{}, err } else {
+	err := retrievable.GetEntity(ctx, id, owner)
+	if err != nil {
+		return &USERS.User{}, err
+	} else {
 		return owner, nil
 	}
 }
@@ -54,7 +57,9 @@ func GetUserFromID(ctx appcontext.Context, id int64)(*USERS.User,error){
 // the need for such a helper function increases.
 func MakeHeader(ctx CONTEXT.Context) *CONTEXT.HeaderData {
 	oldCookie, err := COOKIE.GetValue(ctx.Req, "session")
-	if err == nil { COOKIE.Make(ctx.Res, "session", oldCookie) }
+	if err == nil {
+		COOKIE.Make(ctx.Res, "session", oldCookie)
+	}
 	redirectURL := ctx.Req.URL.Path[1:]
 	if redirectURL == "login" || redirectURL == "register" || redirectURL == "elevatedlogin" {
 		redirectURL = ctx.Req.URL.Query().Get("redirect")
@@ -63,4 +68,3 @@ func MakeHeader(ctx CONTEXT.Context) *CONTEXT.HeaderData {
 		ctx, ctx.User, redirectURL,
 	}
 }
-

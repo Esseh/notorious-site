@@ -24,7 +24,7 @@
 				<!-- Header -->
 					<header id="header" class="alt">
 						{{if .User.Email}}
-						{{$mod := (getMod (getUserInt .User.IntID))}}
+						{{$mod := (getMod (toInt .User.IntID))}}
 						<span class="logo">{{template "pencil" $mod}}</span>
 						{{else}}
 						{{$mod := -1}}
