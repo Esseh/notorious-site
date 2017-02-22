@@ -18,6 +18,18 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.GET(PATHS.NOTES_View, NOTES_GET_View)
 	r.GET(PATHS.NOTES_Editor, NOTES_GET_Editor)
 	r.POST(PATHS.NOTES_Edit, NOTES_POST_Editor)
+	r.GET("/testpage",func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+		ctx := CONTEXT.NewContext(res,req)
+		CORE.ServeTemplateWithParams(res, "note-test", struct{
+			HeaderData CONTEXT.HeaderData
+			HelloString string
+			Array []string
+		}{
+			HeaderData: *MakeHeader(ctx),
+			HelloString: "Hello World",
+			Array:[]string{"I'm"," a"," little", " teapot"},
+		})
+	})
 }
 
 
@@ -30,9 +42,9 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
 		publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
-		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {		
+		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
 			publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
-			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {	
+			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
 				_, noteKey, err := NOTES.CreateNewNote(ctx,
 					NOTES.Content{
 						Title:   req.FormValue("title"),
@@ -41,7 +53,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 					NOTES.Note{
 						OwnerID:   int64(ctx.User.IntID),
 						PublicallyViewable: publicallyViewable,
-						PublicallyEditable: publicallyEditable,		
+						PublicallyEditable: publicallyEditable,
 					},
 				)
 				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
@@ -85,7 +97,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 
 func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
-	if !ctx.AssertLoggedInFailed() { 
+	if !ctx.AssertLoggedInFailed() {
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
 		if !ctx.ErrorPage("Internal Server Error (1)", err, http.StatusSeeOther) {
 			validated := NOTES.CanEditNote(ViewNote,ctx.User)
@@ -127,7 +139,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 						PublicallyViewable: publicallyViewable,
 					},
 				)
-				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
+				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 					ctx.Redirect("/view/"+req.FormValue("notekey"))
 				}
 			}
