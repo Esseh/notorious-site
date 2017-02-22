@@ -29,20 +29,24 @@ func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter
 func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		protected, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
+		publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {		
-			_, noteKey, err := NOTES.CreateNewNote(ctx,
-				NOTES.Content{
-					Title:   req.FormValue("title"),
-					Content: req.FormValue("note"),
-				},
-				NOTES.Note{
-					OwnerID:   int64(ctx.User.IntID),
-					Protected: protected,
-				},
-			)
-			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
-				ctx.Redirect("/view/"+strconv.FormatInt(noteKey.IntID(), 10))
+			publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {	
+				_, noteKey, err := NOTES.CreateNewNote(ctx,
+					NOTES.Content{
+						Title:   req.FormValue("title"),
+						Content: req.FormValue("note"),
+					},
+					NOTES.Note{
+						OwnerID:   int64(ctx.User.IntID),
+						PublicallyViewable: publicallyViewable,
+						PublicallyEditable: publicallyEditable,		
+					},
+				)
+				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
+					ctx.Redirect("/view/"+strconv.FormatInt(noteKey.IntID(), 10))
+				}
 			}
 		}
 	}
@@ -53,7 +57,8 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 	if !ctx.AssertLoggedInFailed() {
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
 		if !ctx.ErrorPage("Internal Server Error (1)", err, http.StatusSeeOther) {
-			owner, err := USERS.GetUserFromID(ctx, ViewNote.OwnerID)
+			if !NOTES.CanViewNote(ViewNote,ctx.User){ ctx.Redirect("/"); return }
+			owner, err := GetUserFromID(ctx, ViewNote.OwnerID)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 				NoteBody := template.HTML(CORE.EscapeString(ViewContent.Content))
 				CORE.ServeTemplateWithParams(res, "viewNote", struct {
@@ -61,6 +66,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					ErrorResponse, RedirectURL, Title, Notekey string
 					Content                                    template.HTML
 					User, Owner                                *USERS.User
+					NoteData								   *NOTES.Note
 				}{
 					HeaderData:    *MakeHeader(ctx),
 					RedirectURL:   req.FormValue("redirect"),
@@ -70,6 +76,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					Content:       NoteBody,
 					User:          ctx.User,
 					Owner:         owner,
+					NoteData:	   ViewNote,
 				})
 			}
 		}
@@ -81,13 +88,14 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 	if !ctx.AssertLoggedInFailed() { 
 		ViewNote, ViewContent, err := NOTES.GetExistingNote(ctx,params.ByName("ID"))
 		if !ctx.ErrorPage("Internal Server Error (1)", err, http.StatusSeeOther) {
-			validated := NOTES.VerifyNotePermission(ctx, ViewNote)
+			validated := NOTES.CanEditNote(ViewNote,ctx.User)
 			if validated {
 				Body := template.HTML(ViewContent.Content)
 				CORE.ServeTemplateWithParams(res, "editnote", struct {
 					HeaderData CONTEXT.HeaderData
 					ErrorResponse, RedirectURL, Title, Notekey string
 					Content                                    template.HTML
+					NoteData								   *NOTES.Note
 				}{
 					HeaderData:    *MakeHeader(ctx),
 					RedirectURL:   req.FormValue("redirect"),
@@ -95,6 +103,7 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 					Title:         ViewContent.Title,
 					Notekey:       params.ByName("ID"),
 					Content:       Body,
+					NoteData:	   ViewNote,
 				})
 			}
 		}
@@ -104,19 +113,23 @@ func NOTES_GET_Editor(res http.ResponseWriter, req *http.Request, params httprou
 func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res,req)
 	if !ctx.AssertLoggedInFailed() {
-		protbool, boolConversionError := strconv.ParseBool(req.FormValue("protection"))
+		publicallyViewable, boolConversionError := strconv.ParseBool(req.FormValue("publically-viewable"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
-			err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
-				NOTES.Content{
-					Content: CORE.EscapeString(req.FormValue("note")),
-					Title: req.FormValue("title"),
-				},
-				NOTES.Note{
-					Protected: protbool,
-				},
-			)
-			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
-				ctx.Redirect("/view/"+req.FormValue("notekey"))
+			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publically-editable"))
+			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
+				err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
+					NOTES.Content{
+						Content: CORE.EscapeString(req.FormValue("note")),
+						Title: req.FormValue("title"),
+					},
+					NOTES.Note{
+						PublicallyEditable: publicallyEditable,
+						PublicallyViewable: publicallyViewable,
+					},
+				)
+				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
+					ctx.Redirect("/view/"+req.FormValue("notekey"))
+				}
 			}
 		}
 	}

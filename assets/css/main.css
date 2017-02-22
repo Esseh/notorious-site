@@ -8,14 +8,20 @@
 */
 
 /* my changes */
+.logo svg#pencil {
+    width: 350px;
+    height: 350px;
+}
+
+
 #nav span.icon.fa-copy {
     font-size: 2rem;
     padding-right: 1rem;
 }
 
 nav img.user-avatar {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 100%;
 }
 
@@ -1963,10 +1969,6 @@ $colors: #E74C3C, #0072B5, #2C3E50;
 			border-bottom-color: transparent;
 		}
 
-	strong, b {
-		font-weight: 400;
-	}
-
 	em, i {
 		font-style: italic;
 	}
@@ -2105,9 +2107,12 @@ $colors: #E74C3C, #0072B5, #2C3E50;
 		color: #ffffff;
 	}
 
-	strong, b {
-		color: #ffffff;
-	}
+  strong, b {
+    color: #000000;
+  }
+  strong, b {
+    font-weight: bold;
+  }
 
 	h1, h2, h3, h4, h5, h6 {
 		color: #ffffff;
@@ -3944,6 +3949,7 @@ $colors: #E74C3C, #0072B5, #2C3E50;
 		width: 64em;
 		max-width: calc(100% - 4em);
 		margin: 0 auto;
+    margin-bottom: 10rem;
 	}
 
 		@media screen and (max-width: 480px) {
