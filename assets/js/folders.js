@@ -1,4 +1,5 @@
 {
+
 alert("javascript loaded.");
 
 var parentFolder1 = {
@@ -66,7 +67,6 @@ var userFolders = [parentFolder1,
                    testNote];
 
 var getFolderById = function(folderId) {
-  console.log(folderId);
   for (let folder of userFolders) {
     if (folderId == folder.id) {
       return folder;
@@ -79,26 +79,25 @@ var clickFolder = function (event) {
   console.log(event.target.id);
   var clickedDiv = event.target.id;
   var clickedFolder = getFolderById(clickedDiv);
-  console.log(clickedFolder);
   if (clickedFolder.expanded == true) {
-    console.log(clickedDiv);
     document.getElementById('' + clickedDiv + '-content').innerHTML = "";
+    $(document.getElementById('' + clickedDiv + '-content')).unbind();
     clickedFolder.expanded = false;
   }
   else {
     for (let referenceId of clickedFolder.references) {
       reference = getFolderById(referenceId);
       $('#' + clickedDiv + '-content').append(
-        '<div id="' + reference.id + '"> ' + reference.name +
-          '<div id="' +reference.id + '-content"> </div> ' +
-        '</div>');
-      $('#' + clickedDiv + '-content').click(clickFolder);
+        '<div id="' + reference.id + '"> ' + reference.name + '</div> </div>' +
+          '<div id="' +reference.id + '-content"> </div> ');
+      $('#' + reference.id).unbind();
+      $('#' + reference.id).click(clickFolder);
 
     }
     clickedFolder.expanded = true;
   }
 };
 
-var folderButton1 = document.getElementById("1");
-folderButton1.addEventListener('click', clickFolder);
+$(document.getElementById("1")).unbind();
+$(document.getElementById("1")).click(clickFolder);
 }
