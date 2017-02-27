@@ -1,7 +1,5 @@
 {
 
-alert("javascript loaded.");
-
 var parentFolder1 = {
     name: "Parent Folder 1",
     id: 1,
@@ -82,18 +80,27 @@ var clickFolder = function (event) {
   if (clickedFolder.expanded == true) {
     document.getElementById('' + clickedDiv + '-content').innerHTML = "";
     $(document.getElementById('' + clickedDiv + '-content')).unbind();
+    $('#' + clickedDiv + '-content').removeClass("open-content");
+    $('#' + clickedDiv + '-content').addClass("content");
+    $('#' + clickedDiv).removeClass("open-folder");
+    $('#' + clickedDiv).addClass("folder");
     clickedFolder.expanded = false;
   }
   else {
     for (let referenceId of clickedFolder.references) {
       reference = getFolderById(referenceId);
       $('#' + clickedDiv + '-content').append(
-        '<div id="' + reference.id + '"> ' + reference.name + '</div> </div>' +
-          '<div id="' +reference.id + '-content"> </div> ');
+        '<div id="' + reference.id + '" class="folder"> ' + reference.name + '</div> </div>' +
+          '<div id="' +reference.id + '-content" class="content"> </div> ');
       $('#' + reference.id).unbind();
       $('#' + reference.id).click(clickFolder);
 
     }
+    $('#' + clickedDiv + '-content').removeClass("content");
+    $('#' + clickedDiv + '-content').addClass("open-content");
+    $('#' + clickedDiv).removeClass("folder");
+    $('#' + clickedDiv).addClass("open-folder");
+    console.log(clickedDiv);
     clickedFolder.expanded = true;
   }
 };

@@ -1,0 +1,49 @@
+#folder-window {
+  padding-top: 100px;
+  width: 80%;
+  background-color: white;
+  text-align: center;
+  margin: auto;
+  height: 100%;
+}
+
+.folder {
+  background-color: #ECF0F1;
+  color: #808080;
+  text-align: left;
+  padding-left: 25px;
+  margin-bottom: 2.4px;
+  border: black;
+  border: solid;
+}
+
+.open-folder {
+  background-color: #935d8c;
+  color: white;
+  text-align: left;
+  padding-left: 25px;
+  border: white;
+  border: solid;
+  border-collapse: collapse;
+}
+
+.folder:hover {
+  background-color: #935d8c;
+  color: white;
+}
+
+.content {
+  background-color: #935d8c;
+}
+
+.open-content {
+  padding-top: 2.4px;
+  padding-bottom: 2.4px;
+  background-color: #935d8c;
+  padding-left: 25px;
+}
+
+body {
+  text-align: center;
+  background-color: black;
+}
