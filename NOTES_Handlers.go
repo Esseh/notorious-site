@@ -18,9 +18,9 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.GET(PATHS.NOTES_View, NOTES_GET_View)
 	r.GET(PATHS.NOTES_Editor, NOTES_GET_Editor)
 	r.POST(PATHS.NOTES_Edit, NOTES_POST_Editor)
-	r.GET("/testpage",func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+	r.GET("/folders",func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
 		ctx := CONTEXT.NewContext(res,req)
-		CORE.ServeTemplateWithParams(res, "note-test", struct{
+		CORE.ServeTemplateWithParams(res, "folders", struct{
 			HeaderData CONTEXT.HeaderData
 			HelloString string
 			Array []string
