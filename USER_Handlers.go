@@ -36,11 +36,13 @@ func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params ht
 					Data      *USERS.User
 					AllNotes  []NOTES.NoteOutput
 					AvatarMod int64
+					Root	  int64
 				}{
 					*MakeHeader(ctx),
 					ci,
 					notes,
 					avatarMod,
+					id,
 				}
 				CORE.ServeTemplateWithParams(res, "user-profile", screen)
 			}
