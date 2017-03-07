@@ -105,6 +105,28 @@ var clickFolder = function (event) {
   }
 };
 
+var addFolder = function (parentString, nameString) {
+  $.post('/folder/api/newfolder', { parent: parentString, name: nameString }, function (data) {
+    console.log(data);
+  });
+};
+
+var removeFolder = function (parentString) {
+  $.post('/folder/api/deletefolder', { parent: parentString }, function (data) {
+    console.log(data);
+  });
+};
+
+var initializeRoot = function () {
+  $.post('/folder/api/initializeroot', {}, function (data) {
+    console.log(data);
+  });
+}
+
+document.getElementById("test-button").onclick = function () {
+  initializeRoot();
+};
+
 $(document.getElementById("1")).unbind();
 $(document.getElementById("1")).click(clickFolder);
 }
