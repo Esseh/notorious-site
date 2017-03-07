@@ -117,6 +117,12 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
 			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publiclyeditable"))
 			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
+				unparsedCollabsStrings := strings.Split(req.FormValue("collaborators"),",")
+				parsedCollabs := make([]int,0)
+				for _,v := range unparsedCollabsStrings {
+					i, err := strconv.ParseInt(v,10,64)
+					if err != nil { parsedCollabs = append(parsedCollabs,i) }
+				}
 				err := NOTES.UpdateNoteContent(ctx,req.FormValue("notekey"),
 					NOTES.Content{
 						Content: CORE.EscapeString(req.FormValue("note")),
@@ -125,6 +131,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 					NOTES.Note{
 						PublicallyEditable: publicallyEditable,
 						PublicallyViewable: publicallyViewable,
+						Collaborators: parsedCollabs,
 					},
 				)
 				if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) { 
