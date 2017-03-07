@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 	"github.com/Esseh/notorious-dev/PATHS"
 	"github.com/julienschmidt/httprouter"
 	"github.com/Esseh/notorious-dev/CONTEXT"
@@ -118,7 +119,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 			publicallyEditable, boolConversionError := strconv.ParseBool(req.FormValue("publiclyeditable"))
 			if !ctx.ErrorPage("Internal Server Error (3)", boolConversionError, http.StatusSeeOther) {
 				unparsedCollabsStrings := strings.Split(req.FormValue("collaborators"),",")
-				parsedCollabs := make([]int,0)
+				parsedCollabs := make([]int64,0)
 				for _,v := range unparsedCollabsStrings {
 					i, err := strconv.ParseInt(v,10,64)
 					if err != nil { parsedCollabs = append(parsedCollabs,i) }
