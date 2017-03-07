@@ -31,4 +31,5 @@ func InitializeHandlers(router *httprouter.Router) {
 	INIT_OAUTH_Handlers(router)
 	INIT_USERS_HANDLERS(router)
 	INIT_NOTES_HANDLERS(router)
+	INIT_FOLDERS_API(router)
 }

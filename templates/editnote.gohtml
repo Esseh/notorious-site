@@ -59,7 +59,10 @@
 
 <div class="row">
 	<input type="button" value = "Save Note" id = "clickMe"></input>
-<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
+<p {{if (ne .NoteData.OwnerID (toInt .HeaderData.User.IntID))}}hidden{{end}}><br>
+	<input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label>
+	<input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label>
+</p>
 </div>
 
 </div>
@@ -70,20 +73,18 @@
 
 <!-- Initialize Quill editor -->
 <script>
-
+document.getElementById("publiclyeditable").checked = {{.NoteData.PublicallyEditable}};
+document.getElementById("publiclyviewable").checked = {{.NoteData.PublicallyViewable}};
 
 document.getElementById("clickMe").onclick = function () {
-	var checkedValue = document.getElementById("publiclyeditable").checked;
-	if (!checkedValue){
-		checkedValue = true;
-	} else {
-		checkedValue = false;
-	}
-	var strchecked = checkedValue.toString();
-	post('/edit/',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML, protection: strchecked, notekey: {{.Notekey}}})
+	post('/edit/',{
+		title: document.getElementById("title").value,
+		note: editor.container.firstChild.innerHTML,
+		publiclyeditable: checkedValue = document.getElementById("publiclyeditable").checked.toString(),
+		publiclyviewable: checkedValue = document.getElementById("publiclyviewable").checked.toString(),
+		notekey: {{.Notekey}}
+	})
 };
-
-
 
 var toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'],        // toggled buttons

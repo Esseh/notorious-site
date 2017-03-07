@@ -32,6 +32,7 @@ func init() {
 		"toInt":         CORE.ToInt,
 		"getMod":        GetMod,
 		"canEditNote":	 NOTES.CanEditNote,
+		"canViewNote":	 NOTES.CanViewNote,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
