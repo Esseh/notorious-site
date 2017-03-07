@@ -124,6 +124,7 @@ var initializeRoot = function () {
 }
 
 document.getElementById("test-button").onclick = function () {
+  console.log("TESTING")
   initializeRoot();
 };
 
