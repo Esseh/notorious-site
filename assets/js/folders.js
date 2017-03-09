@@ -105,8 +105,8 @@ var clickFolder = function (event) {
   }
 };
 
-var addFolder = function (parentString, nameString) {
-  $.post('/folder/api/newfolder', { parent: parentString, name: nameString }, function (data) {
+var addFolder = function () {
+  $.post('/folder/api/newfolder', { ParentID: "5629499534213120", FolderName: "testfolder" }, function (data) {
     console.log(data);
   });
 };
@@ -118,14 +118,15 @@ var removeFolder = function (parentString) {
 };
 
 var initializeRoot = function () {
-  $.post('/folder/api/initializeroot', {}, function (data) {
+  $.post('/folder/api/initializeroot', { RootID: "5629499534213120" }, function (data) {
     console.log(data);
   });
 }
 
 document.getElementById("test-button").onclick = function () {
-  console.log("TESTING")
+  console.log("TESTING");
   initializeRoot();
+  addFolder();
 };
 
 $(document.getElementById("1")).unbind();
