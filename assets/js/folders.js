@@ -106,7 +106,13 @@ var clickFolder = function (event) {
 };
 
 var addFolder = function () {
-  $.post('/folder/api/newfolder', { ParentID: "5629499534213120", FolderName: "testfolder" }, function (data) {
+  $.post('/folder/api/newfolder', { ParentID: "5629499534213120", FolderName: "testfolder123" }, function (data) {
+    console.log(data);
+  });
+};
+
+var openFolder = function () {
+  $.post('folder/api/openfolder', { FolderID: "5629499534213120" }, function (data) {
     console.log(data);
   });
 };
@@ -127,6 +133,7 @@ document.getElementById("test-button").onclick = function () {
   console.log("TESTING");
   initializeRoot();
   addFolder();
+  openFolder();
 };
 
 $(document.getElementById("1")).unbind();
