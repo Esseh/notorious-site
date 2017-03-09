@@ -16,7 +16,11 @@
 </head>
 {{ template "header" .HeaderData}}
 <body>
-<div id="edit"> <a href="/edit/{{.Notekey}}">Edit</a><br>
+
+<div id="edit">
+{{if (canEdit .NoteData .User)}}
+  <a href="/edit/{{.Notekey}}">Edit</a><br>
+{{end}}
 <a href = "/profile/{{.Owner.IntID}}"> Note Owned by: {{.Owner.First}} {{.Owner.Last}} </a>
  </div>
 <div class="box">

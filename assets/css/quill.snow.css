@@ -364,16 +364,18 @@
   display: table;
 }
 .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button {
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.65);
-    background-color: #8171ad;
-    border: none;
-    cursor: pointer;
-    display: inline-block;
-    float: left;
-    height: 24px;
-    outline: none;
-    padding: 3px 5px;
-    width: 28px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.65);
+  background-color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  float: left;
+  height: 24px;
+  outline: none;
+  padding: 3px 5px;
+  width: 28px;
+  border-radius: 0px;
+  margin: 1px;
 }
 .ql-snow.ql-toolbar button svg,
 .ql-snow .ql-toolbar button svg {
@@ -783,14 +785,13 @@
   background-color: #000;
 }
 .ql-toolbar.ql-snow {
-    background-color: #b8abdc;
     border-radius: 8px 8px 0 0;
     box-sizing: border-box;
     font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
     padding: 8px;
 }
 .ql-toolbar.ql-snow .ql-formats {
-  margin-right: 15px;
+  margin-right: 10px;
 }
 .ql-toolbar.ql-snow .ql-picker-label {
   border: 1px solid transparent;

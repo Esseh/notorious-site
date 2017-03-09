@@ -3,10 +3,13 @@ package main
 import (
 	"html/template"
 	"math/rand"
+	"strconv"
+	"strings"
 
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
+	"github.com/Esseh/notorious-dev/NOTES"
 	"github.com/Esseh/notorious-dev/USERS"
 	"github.com/Esseh/retrievable"
 	humanize "github.com/dustin/go-humanize" // russross markdown parser
@@ -30,6 +33,9 @@ func init() {
 		"getDate":       CORE.GetDate,
 		"toInt":         CORE.ToInt,
 		"getMod":        GetMod,
+		"findCollabs":   FindCollaborators,
+		"canEdit":       NOTES.CanEditNote,
+		"canView":       NOTES.CanViewNote,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
@@ -40,6 +46,18 @@ func init() {
 func GetMod(a int64) int64 {
 	rand.Seed(a)
 	return int64(rand.Uint32()) % 10
+}
+
+func FindCollaborators(c string) []int64 {
+	temp := strings.Split(c, ":")
+	var collabs []int64
+	for _, x := range temp {
+		collab, err := strconv.Atoi(x)
+		if err == nil {
+			collabs = append(collabs, int64(collab))
+		}
+	}
+	return collabs
 }
 
 func GetUserFromID(ctx appcontext.Context, id int64) (*USERS.User, error) {

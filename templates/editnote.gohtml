@@ -58,8 +58,15 @@
 
 
 <div class="row">
+	{{if eq .User.IntID .Owner.IntID}}
+	<label>Add Collaborators (seperate IDs with commas):</label>
+	<input name="writingtext" type="hidden">
+	<input type = "text" name="collab" id="collab">
+	<br>
+	<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
+	<p><br><input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label></p>
+	{{end}}
 	<input type="button" value = "Save Note" id = "clickMe"></input>
-<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
 </div>
 
 </div>
@@ -71,16 +78,32 @@
 <!-- Initialize Quill editor -->
 <script>
 
-
+{{if eq .User.IntID .Owner.IntID}}
+if({{.NoteData.PublicallyEditable}}){
+	document.getElementById("publiclyeditable").checked = true;
+}
+if({{.NoteData.PublicallyViewable}}){
+	document.getElementById("publiclyviewable").checked = true;
+}
+{{ end }}
 document.getElementById("clickMe").onclick = function () {
+	{{if eq .User.IntID .Owner.IntID}}
 	var checkedValue = document.getElementById("publiclyeditable").checked;
 	if (!checkedValue){
-		checkedValue = true;
-	} else {
 		checkedValue = false;
+	} else {
+		checkedValue = true;
 	}
 	var strchecked = checkedValue.toString();
-	post('/edit/',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML, protection: strchecked, notekey: {{.Notekey}}})
+	var checkedValue2 = document.getElementById("publiclyviewable").checked;
+	if (!checkedValue2){
+		checkedValue2 = false;
+	} else {
+		checkedValue2 = true;
+	}
+	var strchecked2 = checkedValue2.toString();
+	{{end}}
+	post('/edit/',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML, {{if eq .User.IntID .Owner.IntID}}collaborators: document.getElementById("collab").value, publicedit: strchecked, publicview: strchecked,{{else}}collaborators: "", publicedit: {{.NoteData.PublicallyEditable}}, publicview: {{.NoteData.PublicallyViewable}},{{end}} notekey: {{.Notekey}}})
 };
 
 
