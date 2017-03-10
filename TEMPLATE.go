@@ -49,12 +49,14 @@ func GetMod(a int64) int64 {
 }
 
 func FindCollaborators(c string) []int64 {
+	dupCheck := make(map[int]bool)
 	temp := strings.Split(c, ":")
 	var collabs []int64
 	for _, x := range temp {
 		collab, err := strconv.Atoi(x)
-		if err == nil {
+		if (err == nil) && (!dupCheck[collab]) {
 			collabs = append(collabs, int64(collab))
+			dupCheck[collab] = true
 		}
 	}
 	return collabs

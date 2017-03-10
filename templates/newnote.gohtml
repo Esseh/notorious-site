@@ -58,7 +58,7 @@
 
 
 <div class="row">
-	<label>Add Collaborators (seperate IDs with commas):</label>
+	<label>Add Collaborators (seperate IDs with colons):</label>
 	<input name="writingtext" type="hidden">
 	<input type = "text" name="collab" id="collab">
 	<br>
@@ -90,7 +90,11 @@ document.getElementById("clickMe").onclick = function () {
 		checkedValue2 = true;
 	}
 	var strchecked2 = checkedValue2.toString();
-	post('/new',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML, collaborators: document.getElementById("collab").value, publicedit: strchecked, publicview: strchecked,})
+	post('/new',{title: document.getElementById("title").value ,
+	note: editor.container.firstChild.innerHTML,
+	collaborators: document.getElementById("collab").value,
+	publicedit: strchecked,
+	publicview: strchecked2,})
 };
 
 
