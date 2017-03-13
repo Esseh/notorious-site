@@ -40,7 +40,7 @@ var openFolder = function (folderID) {
     // for (let referenceName of dataObj.folders) {
     // for (let noteName of dataObj.notes) {
     let mockFolders = ["test1", "test2"];
-    let mockNotes = ["123", "1234"];
+    let mockNotes = ["This is a good test note.", "This is an awesome test note."];
 
     $(document.getElementById("" + folderID + '-content')).append(
         '<button id="' + folderID + '-remove-folder" class="remove-folder" value="' + folderID + '"> Delete Folder </button>' +
