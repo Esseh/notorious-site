@@ -1,10 +1,17 @@
 #folder-window {
-  padding-top: 100px;
   width: 80%;
-  background-color: white;
-  text-align: center;
+  background-color: #ECF0F1;
+  text-align: left;
   margin: auto;
-  height: 100%;
+}
+
+.user-input {
+  display: inline !important;
+  border: solid !important;
+  border-color: #808080 !important;
+  color: #808080 !important;
+  width: 101.75px !important;
+  height:30.25px !important;
 }
 
 .folder {
@@ -15,6 +22,82 @@
   margin-bottom: 2.4px;
   border: black;
   border: solid;
+}
+
+.add-folder {
+  display: inline;
+  background-color: #ECF0F1;
+  color: #808080 !important;
+  border: solid;
+  border-color: #808080;
+}
+
+.add-folder:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
+}
+
+.add-note {
+  display: inline;
+  background-color: #ECF0F1;
+  color: #808080 !important;
+  border: solid;
+  border-color: #808080;
+}
+
+.add-note:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
+}
+
+.note-container {
+  width: 85px;
+  text-align: center;
+  display: inline-block;
+  border-color: #808080;
+  border: solid;
+  background-color: #ECF0F1;
+  color: #808080;
+}
+
+.note-container:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
+}
+
+.remove-folder {
+  display: inline;
+  float: right;
+  background-color: #ECF0F1;
+  color: #808080 !important;
+  border: solid;
+  border-color: #808080;
+}
+
+.remove-folder:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
+}
+
+.remove-note {
+  width: 75px !important;
+  display: inline;
+  overflow: hidden;
+  padding: 0 !important;
+  background-color: #ECF0F1;
+  color: #808080 !important;
+  border: solid;
+  border-color: #808080;
+}
+
+.remove-note:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
 }
 
 .open-folder {
@@ -41,6 +124,8 @@
   padding-bottom: 2.4px;
   background-color: #935d8c;
   padding-left: 25px;
+  border: solid;
+  border-color: white;
 }
 
 body {

@@ -1,141 +1,130 @@
 {
 
-var parentFolder1 = {
-    name: "Parent Folder 1",
-    id: 1,
-    isFolder: true,
-    references: [3, 4, 7],
-    expanded: false
-};
-
-var parentFolder2 = {
-    name: "Parent Folder 2",
-    id: 2,
-    isFolder: true,
-    references: [testNote],
-    expanded: false
-};
-
-var childFolder1 = {
-    name: "Child Folder 1",
-    id: 3,
-    isFolder: true,
-    references: [5, 6, 7],
-    expanded: false
-};
-
-var childFolder2 = {
-    name: "Child Folder 2",
-    id: 4,
-    isFolder: true,
-    references: [7],
-    expanded: false
-};
-
-var childOfChildFolder1 = {
-    name: "Child-Child Folder 1",
-    id: 5,
-    isFolder: true,
-    references: [7],
-    expanded: false
-};
-
-var childOfChildFolder2 = {
-    name: "Child-Child Folder 2",
-    id: 6,
-    isFolder: true,
-    references: [7],
-    expanded: false
-};
-
-var testNote = {
-    name: "Test Note",
-    id: 7,
-    isFolder: false,
-    references: [],
-    expanded: false
-};
-
-var userFolders = [parentFolder1,
-                   parentFolder2,
-                   childFolder1,
-                   childFolder2,
-                   childOfChildFolder1,
-                   childOfChildFolder2,
-                   testNote];
-
-var getFolderById = function(folderId) {
-  for (let folder of userFolders) {
-    if (folderId == folder.id) {
-      return folder;
-    }
-  }
-  alert("folderID not found");
-};
-
 var clickFolder = function (event) {
-  console.log(event.target.id);
   var clickedDiv = event.target.id;
-  var clickedFolder = getFolderById(clickedDiv);
-  if (clickedFolder.expanded == true) {
+  openFolder(clickedDiv);
+  $(document.getElementById('' + clickedDiv)).unbind();
+  $(document.getElementById('' + clickedDiv)).click(clickOpenFolder);
+};
+
+var clickOpenFolder = function (event) {
+  var clickedDiv = event.target.id;
     document.getElementById('' + clickedDiv + '-content').innerHTML = "";
     $(document.getElementById('' + clickedDiv + '-content')).unbind();
-    $('#' + clickedDiv + '-content').removeClass("open-content");
-    $('#' + clickedDiv + '-content').addClass("content");
-    $('#' + clickedDiv).removeClass("open-folder");
-    $('#' + clickedDiv).addClass("folder");
-    clickedFolder.expanded = false;
-  }
-  else {
-    for (let referenceId of clickedFolder.references) {
-      reference = getFolderById(referenceId);
-      $('#' + clickedDiv + '-content').append(
-        '<div id="' + reference.id + '" class="folder"> ' + reference.name + '</div> </div>' +
-          '<div id="' +reference.id + '-content" class="content"> </div> ');
-      $('#' + reference.id).unbind();
-      $('#' + reference.id).click(clickFolder);
+    $(document.getElementById('' + clickedDiv + '-content')).removeClass("open-content");
+    $(document.getElementById('' + clickedDiv + '-content')).addClass("content");
+    $(document.getElementById('' + clickedDiv)).removeClass("open-folder");
+    $(document.getElementById('' + clickedDiv)).addClass("folder");
+    $(document.getElementById('' + clickedDiv)).unbind();
+    $(document.getElementById('' + clickedDiv)).click(clickFolder);
+};
 
+var clickAddFolder = function (event) {
+  let baseFolder = event.target.value;
+  console.log(baseFolder);
+  let input = document.getElementById("" + baseFolder + "-user-input");
+  console.log(input.value);
+}
+
+var clickRemoveFolder = function (event) {
+  let baseFolder = event.target.value;
+  console.log(baseFolder);
+}
+
+var openFolder = function (folderID) {
+  let idString = '' + folderID;
+  $.post('/folder/api/openfolder', { FolderID: idString }, function (data) {
+    console.log(data);
+
+    // var dataObj = $.parseJSON(data);
+    // for (let referenceName of dataObj.folders) {
+    // for (let noteName of dataObj.notes) {
+    let mockFolders = ["test1", "test2"];
+    let mockNotes = ["123", "1234"];
+
+    $(document.getElementById("" + folderID + '-content')).append(
+        '<button id="' + folderID + '-remove-folder" class="remove-folder" value="' + folderID + '"> Delete Folder </button>' +
+        '<input id="' + folderID + '-user-input" class="user-input" type=text value="" placeholder=""/>' +
+        '<button id="' + folderID + '-add-folder" class="add-folder" value="' + folderID + '"> New Folder </button>' +
+        '<button id="' + folderID + '-add-note" class="add-note" value="' + folderID + '"> Add Note </button>');
+    $(document.getElementById("" + folderID + "-add-folder")).unbind();
+    $(document.getElementById("" + folderID + "-add-folder")).click(clickAddFolder);
+    $(document.getElementById("" + folderID + "-remove-folder")).unbind()
+    $(document.getElementById("" + folderID + "-remove-folder")).click(clickRemoveFolder);
+    for (let referenceName of mockFolders) {
+      let referenceId = "" + folderID + "/" + referenceName;
+      $(document.getElementById("" + folderID + '-content')).append(
+          '<div id="' + referenceId + '" class="folder"> ' + referenceName + '</div>' +
+          // this ended with double </div>, assure no errors now that second div has been removed.
+          '<div id="' +referenceId + '-content" class="content"> </div> ');
+      $(document.getElementById(referenceId)).unbind();
+      $(document.getElementById(referenceId)).click(clickFolder);
     }
-    $('#' + clickedDiv + '-content').removeClass("content");
-    $('#' + clickedDiv + '-content').addClass("open-content");
-    $('#' + clickedDiv).removeClass("folder");
-    $('#' + clickedDiv).addClass("open-folder");
-    console.log(clickedDiv);
-    clickedFolder.expanded = true;
-  }
+    for (let noteName of mockNotes) {
+      let noteId = "" + folderID + "/" + noteName;
+      $(document.getElementById("" + folderID + '-content')).append(
+          '<div class="note-container">' +
+            '<div id="' + noteId + '" class="note"> ' + noteName + '</div>' +
+            '<button id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> Remove </button>' +
+          '</div>');
+      $(document.getElementById(noteId)).unbind();
+      $(document.getElementById(noteId)).click(openNote);
+    }
+    $(document.getElementById('' + folderID + '-content')).removeClass("content");
+    $(document.getElementById('' + folderID + '-content')).addClass("open-content");
+    $(document.getElementById('' + folderID)).removeClass("folder");
+    $(document.getElementById('' + folderID)).addClass("open-folder");
+  });
 };
 
-var addFolder = function () {
-  $.post('/folder/api/newfolder', { ParentID: "5629499534213120", FolderName: "testfolder123" }, function (data) {
+var addFolder = function (parentId, folderName) {
+  let parentIdString = "" + parentId;
+  $.post('/folder/api/newfolder', { ParentID: parentIdString, FolderName: folderName }, function (data) {
     console.log(data);
   });
 };
 
-var openFolder = function () {
-  $.post('folder/api/openfolder', { FolderID: "5629499534213120" }, function (data) {
+var removeFolder = function (parentId, folderName) {
+  let parentIdString = "" + parentId;
+  $.post('/folder/api/deletefolder', { ParentID: parentIdString, FolderName: folderName }, function (data) {
     console.log(data);
   });
 };
 
-var removeFolder = function (parentString) {
-  $.post('/folder/api/deletefolder', { parent: parentString }, function (data) {
-    console.log(data);
-  });
-};
-
-var initializeRoot = function () {
-  $.post('/folder/api/initializeroot', { RootID: "5629499534213120" }, function (data) {
+var addNote = function (parentId, noteId) {
+  let parentIdString = "" + parentId;
+  let noteIdInt = parseInt(noteID, 10);
+  $.post('/folder/api/addnote', { ParentID: parentIdString, NoteID: noteIdInt }, function (data) {
     console.log(data);
   });
 }
 
-document.getElementById("test-button").onclick = function () {
-  console.log("TESTING");
-  initializeRoot();
-  addFolder();
-  openFolder();
+var removeNote = function (parentId, noteId) {
+  let parentIdString = "" + parentId;
+  let noteIdInt = parseInt(noteID, 10);
+  $.post('/folder/api/removenote', { ParentID: parentIdString, NoteID: noteIdInt }, function (data) {
+    console.log(data);
+  });
+}
+
+var initializeRoot = function () {
+  $.post('/folder/api/initializeroot', { RootID: "5629499534213120" }, function (data) {
+  });
+  $(document.getElementsByClassName('root')).unbind();
+  $(document.getElementsByClassName('root')).click(clickFolder);
 };
 
-$(document.getElementById("1")).unbind();
-$(document.getElementById("1")).click(clickFolder);
+var openNote = function () {
+  console.log('Open Note called');
+  // will eventually navigate to note.
+}
+
+// ID of folders will me parentID+/+folderName+/+folderName+/+
+
+// folders on returned data has no quotes around it so Json.parsing doesn't work.
+
+$(document.getElementsByClassName('root')).unbind();
+$(document.getElementsByClassName('root')).click(initializeRoot);
+$(document.getElementsByClassName('root')).click(clickFolder);
+
 }

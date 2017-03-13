@@ -14,6 +14,7 @@
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="/assets/css/main.css" />
 		<link rel="stylesheet" href="/assets/css/user-profile.css" />
+    <link rel="stylesheet" href="/assets/css/folders.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
 		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
 	</head>
@@ -54,6 +55,13 @@
 
 				<!-- Main -->
 				  <button id="test-button"> Test {{.Root}} </button>
+
+				  <div id="folder-window">
+            <div id="{{.Root}}" class ="folder root"> Root Folder </div>
+              <div id="{{.Root}}-content" class="content">
+              </div>
+          </div>
+
 					<div id="main">
 						{{ $d := .Data}}
 						{{ $u := .User}}
