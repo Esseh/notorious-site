@@ -84,19 +84,14 @@
 }
 
 .remove-note {
-  width: 75px !important;
-  display: inline;
-  overflow: hidden;
-  padding: 0 !important;
-  background-color: #ECF0F1;
-  color: #808080 !important;
+  width: 25px;
+  height: 25px;
+  float: right;
+  padding: 0;
+  font-weight: 900;
+  background-color: darkred;
+  color: white;
   border: solid;
-  border-color: #808080;
-}
-
-.remove-note:hover {
-  background-color: #935d8c !important;
-  color: white !important;
   border-color: white;
 }
 

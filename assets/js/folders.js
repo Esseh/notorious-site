@@ -64,9 +64,11 @@ var openFolder = function (folderID) {
       let noteId = "" + folderID + "/" + noteName;
       $(document.getElementById("" + folderID + '-content')).append(
           '<div class="note-container">' +
+            '<div id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> X </div>' +
             '<div id="' + noteId + '" class="note"> ' + noteName + '</div>' +
-            '<button id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> Remove </button>' +
           '</div>');
+      $(document.getElementById(noteId + "-remove-note")).unbind();
+      $(document.getElementById(noteId + "-remove-note")).click(clickRemoveNote);
       $(document.getElementById(noteId)).unbind();
       $(document.getElementById(noteId)).click(openNote);
     }
@@ -113,6 +115,10 @@ var initializeRoot = function () {
   $(document.getElementsByClassName('root')).unbind();
   $(document.getElementsByClassName('root')).click(clickFolder);
 };
+
+var clickRemoveNote = function () {
+  console.log('remove note called');
+}
 
 var openNote = function () {
   console.log('Open Note called');
