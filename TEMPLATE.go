@@ -3,9 +3,8 @@ package main
 import (
 	"html/template"
 	"math/rand"
-	"strconv"
 	"strings"
-
+	"github.com/Esseh/notorious-dev/AUTH"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
@@ -38,6 +37,7 @@ func init() {
 		"findCollabs":   FindCollaborators,
 		"canEdit":       NOTES.CanEditNote,
 		"canView":       NOTES.CanViewNote,
+		"getEmail":		 GetEmail,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
@@ -50,15 +50,22 @@ func GetMod(a int64) int64 {
 	return int64(rand.Uint32()) % 10
 }
 
-func FindCollaborators(c string) []int64 {
-	dupCheck := make(map[int]bool)
+func GetEmail(ctx appcontext.Context, userID int64) string {
+	u := USERS.User{}
+	retrievable.GetEntity(ctx,userID,&u)
+	return u.Email
+}
+
+func FindCollaborators(ctx CONTEXT.Context,c string) []int64 {
+	dupCheck := make(map[int64]bool)
 	temp := strings.Split(c, ":")
 	var collabs []int64
 	for _, x := range temp {
-		collab, err := strconv.Atoi(x)
-		if (err == nil) && (!dupCheck[collab]) {
-			collabs = append(collabs, int64(collab))
-			dupCheck[collab] = true
+		nextEntry := AUTH.EmailReference{}
+		err := retrievable.GetEntity(ctx,x,&nextEntry)
+		if (err == nil) && (!dupCheck[nextEntry.UserID]) {
+			collabs = append(collabs, nextEntry.UserID)
+			dupCheck[nextEntry.UserID] = true
 		}
 	}
 	return collabs

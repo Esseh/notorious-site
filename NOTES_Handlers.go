@@ -40,7 +40,7 @@ func NOTES_POST_New(res http.ResponseWriter, req *http.Request, params httproute
 				},
 				NOTES.Note{
 					OwnerID:            int64(ctx.User.IntID),
-					Collaborators:      FindCollaborators(req.FormValue("collaborators")),
+					Collaborators:      FindCollaborators(ctx,req.FormValue("collaborators")),
 					PublicallyEditable: publicedit,
 					PublicallyViewable: publicview,
 				},
@@ -131,7 +131,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 					Title:   req.FormValue("title"),
 				},
 				NOTES.Note{
-					Collaborators:      FindCollaborators(req.FormValue("collaborators")),
+					Collaborators:      FindCollaborators(ctx,req.FormValue("collaborators")),
 					PublicallyEditable: edit,
 					PublicallyViewable: view,
 				},

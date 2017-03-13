@@ -59,9 +59,10 @@
 
 <div class="row">
 	{{if eq .User.IntID .Owner.IntID}}
+		{{$ctx := .HeaderData.Ctx }}
 	<label>Add Collaborators (seperate IDs with colons):</label>
 	<input name="writingtext" type="hidden">
-	<input type = "text" name="collab" value="{{range $i, $e := .NoteData.Collaborators}}{{$e}}:{{end}}" id="collab">
+	<input type = "text" name="collab" value="{{range $i, $e := .NoteData.Collaborators}}{{getEmail $ctx $e}}:{{end}}" id="collab">
 	<br>
 	<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
 	<p><br><input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label></p>
