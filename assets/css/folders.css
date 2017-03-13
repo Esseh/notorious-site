@@ -66,6 +66,15 @@
   color: #808080;
 }
 
+.menu {
+  border: none;
+}
+
+.open-menu {
+ border:solid;
+ border-color:white;
+}
+
 .note-container:hover {
   background-color: #935d8c !important;
   color: white !important;
@@ -120,12 +129,13 @@
 }
 
 .open-content {
-  padding-top: 2.4px;
-  padding-bottom: 2.4px;
   background-color: #935d8c;
+  padding: 0;
   padding-left: 25px;
   border: solid;
   border-color: white;
+  border-top: 0;
+  border-bottom: 0;
 }
 
 body {
