@@ -130,9 +130,7 @@ var clickAddFolder = function (event) {
 // This will take the click event info and feed it into the removeFolder function.
 var clickRemoveFolder = function (event) {
   let confirmFolderName = function() {
-  console.log(document.getElementById('prompt-input'));
   let inputValue = document.getElementById('prompt-input').value;
-  console.log(document.getElementById('prompt-input').value);
   let baseFolder = event.target.value;
   removeFolder(baseFolder, inputValue);
   }
@@ -144,7 +142,6 @@ var clickRemoveFolder = function (event) {
 var clickAddNote = function (event) {
   let confirmNoteURL = function() {
   let inputValue = document.getElementById('prompt-input').value;
-  console.log(document.getElementById('prompt-input').value);
   let baseFolder = event.target.value;
   addNote(baseFolder, inputValue);
   }
@@ -157,62 +154,72 @@ var openFolder = function (folderID) {
   let idString = '' + folderID;
   $.post('/folder/api/openfolder', { FolderID: idString }, function (data) {
     let dataObj = $.parseJSON(data);
-    let parentId = document.getElementById("" + folderID).getAttribute('value');
+    if(dataObj.success == true) {
 
-    // Set all open-menus to menus and clear them.
-    let menus = document.getElementsByClassName('open-menu');
-      for (let menuDiv of menus) {
-        menuDiv.innerHTML = "";
-        $(menuDiv).removeClass('open-menu');
-        $(menuDiv).addClass('menu');
+      let parentId = document.getElementById("" + folderID).getAttribute('value');
+
+      // Set all open-menus to menus and clear them.
+      let menus = document.getElementsByClassName('open-menu');
+        for (let menuDiv of menus) {
+          menuDiv.innerHTML = "";
+          $(menuDiv).removeClass('open-menu');
+          $(menuDiv).addClass('menu');
+        }
+      // Change the current folders menu to open and add its content.
+      $(document.getElementById("" + folderID + '-menu')).append(
+          '<button id="' + folderID + '-remove-folder" class="remove-folder" value="' + folderID + '"> Delete Folder </button>' +
+          '<button id="' + folderID + '-add-folder" class="add-folder" value="' + folderID + '"> New Folder </button>' +
+          '<button id="' + folderID + '-add-note" class="add-note" value="' + folderID + '"> Add Note </button>');
+      $(document.getElementById("" + folderID + '-menu')).removeClass('menu');
+      $(document.getElementById("" + folderID + '-menu')).addClass('open-menu');
+      $(document.getElementById("" + folderID + "-add-folder")).unbind();
+      $(document.getElementById("" + folderID + "-add-folder")).click(clickAddFolder);
+      $(document.getElementById("" + folderID + "-add-note")).unbind();
+      $(document.getElementById("" + folderID + "-add-note")).click(clickAddNote);
+      $(document.getElementById("" + folderID + "-remove-folder")).unbind()
+      $(document.getElementById("" + folderID + "-remove-folder")).click(clickRemoveFolder);
+
+      // Append all child folder divs into the folder content.
+      for (let referenceName of dataObj.folders) {
+        if(referenceName != "") {
+          let referenceId = "" + folderID + "/" + referenceName;
+          $(document.getElementById("" + folderID + '-content')).append(
+              '<div id="' + referenceId + '" class="folder" value="' + folderID + '"> ' + referenceName + ' </div>' +
+              '<div id="' + referenceId + '-menu" class="menu"></div> ' +
+              '<div id="' + referenceId + '-content" class="content"></div> ');
+          $(document.getElementById(referenceId)).unbind();
+          $(document.getElementById(referenceId)).click(clickFolder);
+        }
       }
-    // Change the current folders menu to open and add its content.
-    $(document.getElementById("" + folderID + '-menu')).append(
-        '<button id="' + folderID + '-remove-folder" class="remove-folder" value="' + folderID + '"> Delete Folder </button>' +
-        '<button id="' + folderID + '-add-folder" class="add-folder" value="' + folderID + '"> New Folder </button>' +
-        '<button id="' + folderID + '-add-note" class="add-note" value="' + folderID + '"> Add Note </button>');
-    $(document.getElementById("" + folderID + '-menu')).removeClass('menu');
-    $(document.getElementById("" + folderID + '-menu')).addClass('open-menu');
-    $(document.getElementById("" + folderID + "-add-folder")).unbind();
-    $(document.getElementById("" + folderID + "-add-folder")).click(clickAddFolder);
-    $(document.getElementById("" + folderID + "-add-note")).unbind();
-    $(document.getElementById("" + folderID + "-add-note")).click(clickAddNote);
-    $(document.getElementById("" + folderID + "-remove-folder")).unbind()
-    $(document.getElementById("" + folderID + "-remove-folder")).click(clickRemoveFolder);
 
-    // Append all child folder divs into the folder content.
-    for (let referenceName of dataObj.folders) {
-      if(referenceName != "") {
-        let referenceId = "" + folderID + "/" + referenceName;
+      //Append all child note divs into the folder content
+      for (let note of dataObj.notes) {
+        let noteId = "" + folderID + "/" + note.id;
         $(document.getElementById("" + folderID + '-content')).append(
-            '<div id="' + referenceId + '" class="folder" value="' + folderID + '"> ' + referenceName + ' </div>' +
-            '<div id="' + referenceId + '-menu" class="menu"></div> ' +
-            '<div id="' + referenceId + '-content" class="content"></div> ');
-        $(document.getElementById(referenceId)).unbind();
-        $(document.getElementById(referenceId)).click(clickFolder);
+            '<div id="' + noteId + '-container" class="note-container">' +
+              '<div id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> X </div>' +
+              '<div id="' + noteId + '" class="note" value="' + note.id + '""> ' + note.title + '</div>' +
+            '</div>');
+        $(document.getElementById(noteId + "-remove-note")).unbind();
+        $(document.getElementById(noteId + "-remove-note")).click(clickRemoveNote);
+        $(document.getElementById(noteId)).unbind();
+        $(document.getElementById(noteId)).click(openNote);
+      }
+      $(document.getElementById('' + folderID + '-content')).removeClass("content");
+      $(document.getElementById('' + folderID + '-content')).addClass("open-content");
+      $(document.getElementById('' + folderID)).removeClass("folder");
+      $(document.getElementById('' + folderID)).addClass("open-folder");
+      if(document.getElementById('' + folderID + '-content').innerHTML == "") {
+        document.getElementById('' + folderID + '-content').innerHTML = "(empty)";
       }
     }
-
-    //Append all child note divs into the folder content
-    console.log(dataObj.notes);
-    for (let note of dataObj.notes) {
-      let noteId = "" + folderID + "/" + note.id;
-      $(document.getElementById("" + folderID + '-content')).append(
-          '<div id="' + noteId + '-container" class="note-container">' +
-            '<div id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> X </div>' +
-            '<div id="' + noteId + '" class="note" value="' + note.id + '""> ' + note.title + '</div>' +
-          '</div>');
-      $(document.getElementById(noteId + "-remove-note")).unbind();
-      $(document.getElementById(noteId + "-remove-note")).click(clickRemoveNote);
-      $(document.getElementById(noteId)).unbind();
-      $(document.getElementById(noteId)).click(openNote);
-    }
-    $(document.getElementById('' + folderID + '-content')).removeClass("content");
-    $(document.getElementById('' + folderID + '-content')).addClass("open-content");
-    $(document.getElementById('' + folderID)).removeClass("folder");
-    $(document.getElementById('' + folderID)).addClass("open-folder");
-    if(document.getElementById('' + folderID + '-content').innerHTML == "") {
-      document.getElementById('' + folderID + '-content').innerHTML = "(empty)";
+    else {
+      if (dataObj.code == 0) {
+        displayError("An error has occured.", "Unable to open folder.");
+      }
+      if (dataObj.code == 1) {
+        displayError("A database error has occured.");
+      }
     }
   });
 };
@@ -221,8 +228,24 @@ var openFolder = function (folderID) {
 var addFolder = function (parentId, folderName) {
   let parentIdString = "" + parentId;
   $.post('/folder/api/newfolder', { ParentID: parentIdString, FolderName: folderName }, function (data) {
-    console.log(data);
-    refreshContent(parentId);
+    let dataObj = $.parseJSON(data);
+    if(dataObj.success == true) {
+      refreshContent(parentId);
+    }
+    else {
+      if (dataObj.code == 0) {
+        displayError("An error has occured.", "Enure that a folder of the same name does not already exist in the parent folder.");
+      }
+      if (dataObj.code == 1) {
+        displayError("A database error has occured.");
+      }
+      if (dataObj.code == 2) {
+        displayError("The filepath for this folder is exceeds the 400 character limit.");
+      }
+      if (dataObj.code == 3) {
+        displayError("You do not own the parent folder.");
+      }
+    }
   });
 };
 
@@ -230,7 +253,24 @@ var addFolder = function (parentId, folderName) {
 var removeFolder = function (parentId, folderName) {
   let parentIdString = "" + parentId;
   $.post('/folder/api/deletefolder', { ParentID: parentIdString, FolderName: folderName }, function (data) {
-    refreshContent(parentId);
+    let dataObj = $.parseJSON(data);
+    if(dataObj.success == true) {
+      refreshContent(parentId);
+    }
+    else {
+      if (dataObj.code == 0) {
+        displayError("An error has occured.");
+      }
+      if (dataObj.code == 1) {
+        displayError("A database error has occured.", "Ensure that the value entered matches the name of the folder you are trying to delete.");
+      }
+      if (dataObj.code == 3) {
+        displayError("You do not own the parent folder.");
+      }
+      if (dataObj.code == 4) {
+        displayError("The folder is ROOT", "You cannot delete your base folder.");
+      }
+    }
   });
 };
 
@@ -239,27 +279,66 @@ var addNote = function (parentId, noteId) {
   let parentIdString = "" + parentId;
   let noteIdInt = parseInt(noteId.substring(noteId.lastIndexOf('/') + 1), 10);
   $.post('/folder/api/addnote', { FolderID: parentIdString, NoteID: noteIdInt }, function (data) {
-    console.log(data);
-    refreshContent(parentId);
+    let dataObj = $.parseJSON(data);
+    if(dataObj.success == true) {
+      refreshContent(parentId);
+    }
+    else {
+      if (dataObj.code == 0) {
+        displayError("An error has occured.", "Ensure that the given note is not already in this folder.");
+      }
+      if (dataObj.code == 1) {
+        displayError("A database error has occured.", "Ensure that you have pasted a valid link into the input field.");
+      }
+      if (dataObj.code == 3) {
+        displayError("You do not own the parent folder.");
+      }
+    }
   });
-}
+};
 
 // This funcion makes an api call to remove a folder with the given parameters.
 var removeNote = function (parentId, folderNoteId) {
-  let parentIdString = "" + parentId;
-  let noteId = folderNoteId.substring(folderNoteId.lastIndexOf('/') + 1, (folderNoteId.indexOf('-')));
-  let noteIdInt = parseInt(noteId, 10);
-  console.log(parentIdString);
-  console.log(noteIdInt);
-  $.post('/folder/api/removenote', { FolderID: parentIdString, NoteID: noteIdInt }, function (data) {
-    console.log(data);
-    refreshContent(parentId);
-  });
-}
+  let removeConfirm = function () {
+    let parentIdString = "" + parentId;
+    let noteId = folderNoteId.substring(folderNoteId.lastIndexOf('/') + 1, (folderNoteId.indexOf('-')));
+    let noteIdInt = parseInt(noteId, 10);
+    $.post('/folder/api/removenote', { FolderID: parentIdString, NoteID: noteIdInt }, function (data) {
+      let dataObj = $.parseJSON(data);
+      if(dataObj.success == true) {
+        refreshContent(parentId);
+      }
+      else {
+        if (dataObj.code == 0) {
+          displayError("An error has occured.");
+        }
+        if (dataObj.code == 1) {
+          displayError("A database error has occured.");
+        }
+        if (dataObj.code == 3) {
+          displayError("You do not own the parent folder.");
+        }
+      }
+    });
+  }
+  createBoolPrompt("Are you sure you would like to remove this note?", removeConfirm);
+};
 
 // This funcion makes an api call to initialize the root folder. It is called when the javascript is loaded.
 var initializeRoot = function (rootId) {
   $.post('/folder/api/initializeroot', { RootID: rootId }, function (data) {
+    let dataObj = $.parseJSON(data);
+    if(!((dataObj.code == -1) || (dataObj.code == 6))) {
+      if (dataObj.code == 0) {
+        displayError("An error has occured when initializing the root folder.");
+      }
+      if (dataObj.code == 1) {
+        displayError("A database error has occured.");
+      }
+      if (dataObj.code == 5) {
+        displayError("The ID of the root folder does not match the ID of the user.");
+      }
+    }
   });
 };
 
@@ -267,16 +346,12 @@ var initializeRoot = function (rootId) {
 var clickRemoveNote = function (event) {
   let baseFolder = event.target.getAttribute('value');
   let folderNoteId = "" + event.target.id;
-  console.log(baseFolder);
-  console.log(folderNoteId);
   removeNote(baseFolder, folderNoteId);
 };
 
 // This is the function called when the add note button is clicked. It will feed the event info to the addNote function.
 var openNote = function (event) {
-  console.log(event.target);
   window.open('/view/' + event.target.getAttribute("value"), "_blank");
-  // will eventually navigate to note.
 };
 
 /////////////////////////////////////
@@ -298,15 +373,50 @@ var closePrompt = function() {
 };
 
 var createPrompt = function(message, confirmFunction) {
-    document.getElementById('prompt-box').style.visibility = "visible";
-    document.getElementById('prompt-box').innerHTML = '<div id="prompt-close">x</div>' +
-        '<div id="prompt-message">' + message + '</div>' +
-        '<input id="prompt-input" type="text" name="prompt-input" value=""/>' +
-        '<button id="prompt-confirm"> Confirm </button>';
-    $(document.getElementById('prompt-confirm')).unbind();
-    $(document.getElementById('prompt-confirm')).click(confirmFunction);
-    $(document.getElementById('prompt-confirm')).click(closePrompt);
-    $(document.getElementById('prompt-close')).click(closePrompt);
+  document.getElementById('prompt-box').style.visibility = "visible";
+  document.getElementById('prompt-box').innerHTML = '<div id="prompt-close">x</div>' +
+      '<div id="prompt-message">' + message + '</div>' +
+      '<input id="prompt-input" type="text" name="prompt-input" value=""/>' +
+      '<button id="prompt-confirm"> Confirm </button>';
+  $(document.getElementById('prompt-confirm')).unbind();
+  $(document.getElementById('prompt-confirm')).click(confirmFunction);
+  $(document.getElementById('prompt-confirm')).click(closePrompt);
+  $(document.getElementById('prompt-close')).unbind(closePrompt);
+  $(document.getElementById('prompt-close')).click(closePrompt);
+};
+
+var createBoolPrompt = function (message, confirmFunction) {
+  document.getElementById('prompt-box').style.visibility = "visible";
+  document.getElementById('prompt-box').innerHTML = '<div id="prompt-close">x</div>' +
+      '<div id="prompt-message">' + message + '</div>' +
+    '<div style="text-align:center"> ' +
+      '<button id="prompt-cancel"> Cancel </button>' +
+      '<button id="prompt-confirm"> Confirm </button>' +
+    '</div>';
+  $(document.getElementById('prompt-confirm')).unbind();
+  $(document.getElementById('prompt-confirm')).click(confirmFunction);
+  $(document.getElementById('prompt-confirm')).click(closePrompt);
+  $(document.getElementById('prompt-close')).unbind(closePrompt);
+  $(document.getElementById('prompt-close')).click(closePrompt);
+  $(document.getElementById('prompt-cancel')).unbind(closePrompt);
+  $(document.getElementById('prompt-cancel')).click(closePrompt);
+}
+
+var closeError = function() {
+  document.getElementById("error-box").style.visibility = "hidden";
+};
+
+var displayError = function(leadMessage, followMessage) {
+  document.getElementById('error-box').style.visibility = "visible";
+  if(followMessage) {
+    document.getElementById('error-box').innerHTML = '<div id="error-close">x</div>' +
+        '<div id="error-message"><strong> Error: ' + leadMessage + ' </strong> <br>' + followMessage + '</div>';
+  }
+  else {
+    document.getElementById('error-box').innerHTML = '<div id="error-close">x</div>' +
+        '<div id="error-message"><strong> Error: ' + leadMessage + ' </strong></div>';
+  }
+  $(document.getElementById('error-close')).click(closeError);
 };
 
 }

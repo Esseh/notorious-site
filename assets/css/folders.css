@@ -23,6 +23,31 @@
     cursor: pointer;
 }
 
+#error-box{
+    position:fixed;
+    top:20%;
+    left:50%;
+    margin-left: -150px;
+    width: 350px;
+    border: solid;
+    border-color: black;
+    color: black;
+    background-color: #ff8080;
+    padding: 20px;
+    visibility: hidden;
+}
+#error-close{
+    position: absolute;
+    right:0;
+    top: 0;
+    background-color: black;
+    border: solid 1px white;
+    color: white;
+    width: 1em;
+    text-align: center;
+    cursor: pointer;
+}
+
 #prompt-confirm {
   display: inline;
   background-color: #ECF0F1;
@@ -31,6 +56,19 @@
   border-color: #808080;
 }
 #prompt-confirm:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
+}
+
+#prompt-cancel {
+  display: inline;
+  background-color: #ECF0F1;
+  color: #808080 !important;
+  border: solid;
+  border-color: #808080;
+}
+#prompt-cancel:hover {
   background-color: #935d8c !important;
   color: white !important;
   border-color: white;
