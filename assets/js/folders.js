@@ -1,13 +1,25 @@
 {
 
-// NOTE: A folder's "value" holds is it's parent folder's ID.
+// NOTE: A folder's "value" holds is it's parent folder's ID. Value is used to store data for function calls on divs.
 
 // NOTE: The root folder's id will be a number value associated with the user's profile.
 // The ids of folders inside of the root follow a standard format.
-// For example, say the rootID is "12345", a folder named "testFolder" located inside the root folder will have an id "12345/testfolder"
+// For example, say the rootID is "12345", a folder named "testFolder" located inside the root folder will have an id "12345/testfolder".
 // Here is an example of a folder a few layers down, "12345/testFolder/childOfTestFolder/grandchildTestFolder".
 
-/////////////////////////////////
+////////////////////
+
+// This handles initializing the root folder and opening it when the .js file is initially loaded.
+var rootArray = document.getElementsByClassName('root');
+for (let root of rootArray) {
+  initializeRoot(root.id);
+  $(root).click(clickFolder);
+  openFolder(root.id);
+  $(document.getElementById(root.id)).unbind();
+  $(document.getElementById(root.id)).click(clickOpenFolder);
+}
+
+////////////////////
 
 // This is the function called when a closed folder is clicked.
 // This will open the folder, close any open menus, open this folder's menu, and close all open folders that are not part of its parent chain.
@@ -147,6 +159,18 @@ var clickAddNote = function (event) {
   }
   createPrompt('Copy and paste the URL of the note you would like to add.', confirmNoteURL);
 }
+
+// This is the function called when the remove note button is clicked. It will feed the event info to the removeNote function.
+var clickRemoveNote = function (event) {
+  let baseFolder = event.target.getAttribute('value');
+  let folderNoteId = "" + event.target.id;
+  let removeConfirm = function {
+    removeNote(baseFolder, folderNoteId);
+  }
+  createBoolPrompt("Are you sure you would like to remove this note?", removeConfirm);
+};
+
+////////////////////
 
 // This is the function to open a folder using an api call.
 // This will also open a folders menu and content and filling them. Additionally, this will clear and close all other menus.
@@ -299,7 +323,6 @@ var addNote = function (parentId, noteId) {
 
 // This funcion makes an api call to remove a folder with the given parameters.
 var removeNote = function (parentId, folderNoteId) {
-  let removeConfirm = function () {
     let parentIdString = "" + parentId;
     let noteId = folderNoteId.substring(folderNoteId.lastIndexOf('/') + 1, (folderNoteId.indexOf('-')));
     let noteIdInt = parseInt(noteId, 10);
@@ -320,8 +343,6 @@ var removeNote = function (parentId, folderNoteId) {
         }
       }
     });
-  }
-  createBoolPrompt("Are you sure you would like to remove this note?", removeConfirm);
 };
 
 // This funcion makes an api call to initialize the root folder. It is called when the javascript is loaded.
@@ -342,31 +363,12 @@ var initializeRoot = function (rootId) {
   });
 };
 
-// This is the function called when the remove note button is clicked. It will feed the event info to the removeNote function.
-var clickRemoveNote = function (event) {
-  let baseFolder = event.target.getAttribute('value');
-  let folderNoteId = "" + event.target.id;
-  removeNote(baseFolder, folderNoteId);
-};
-
 // This is the function called when the add note button is clicked. It will feed the event info to the addNote function.
 var openNote = function (event) {
   window.open('/view/' + event.target.getAttribute("value"), "_blank");
 };
 
-/////////////////////////////////////
-
-// This handles initializing the root folder and opening it when the .js file is initially loaded.
-var rootArray = document.getElementsByClassName('root');
-for (let root of rootArray) {
-  initializeRoot(root.id);
-  $(root).click(clickFolder);
-  openFolder(root.id);
-  $(document.getElementById(root.id)).unbind();
-  $(document.getElementById(root.id)).click(clickOpenFolder);
-}
-
-////////////////////////////////////
+////////////////////
 
 var closePrompt = function() {
     document.getElementById("prompt-box").style.visibility = "hidden";
