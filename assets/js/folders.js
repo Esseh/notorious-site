@@ -7,7 +7,7 @@
 // For example, say the rootID is "12345", a folder named "testFolder" located inside the root folder will have an id "12345/testfolder".
 // Here is an example of a folder a few layers down, "12345/testFolder/childOfTestFolder/grandchildTestFolder".
 
-////////////////////
+//////////////////// ONLOAD OPERATIONS ////////////////////
 
 // This handles initializing the root folder and opening it when the .js file is initially loaded.
 var rootArray = document.getElementsByClassName('root');
@@ -19,14 +19,39 @@ for (let root of rootArray) {
   $(document.getElementById(root.id)).click(clickOpenFolder);
 }
 
-////////////////////
+//////////////////// GENERIC FUNCTIONS ////////////////////
+
+// This function is used to refresh a folder's content to reflect changes made on the back end.
+var refreshContent = function (folderId) {
+    let divId = folderId;
+
+    // Close folder content and set it to empty.
+    document.getElementById('' + divId + '-content').innerHTML = "";
+    $(document.getElementById('' + divId + '-content')).unbind();
+    $(document.getElementById('' + divId + '-content')).removeClass("open-content");
+    $(document.getElementById('' + divId + '-content')).addClass("content");
+    $(document.getElementById('' + divId)).removeClass("open-folder");
+    $(document.getElementById('' + divId)).addClass("folder");
+
+    // Reopen the folder.
+    openFolder(divId);
+    $(document.getElementById('' + divId)).unbind();
+    $(document.getElementById('' + divId)).click(clickOpenFolder);
+}
+
+//////////////////// ONCLICK FUNCTIONS ////////////////////
+
+// This is the function called when a note is clicked. It will open the note in a new window.
+var openNote = function (event) {
+  window.open('/view/' + event.target.getAttribute("value"), "_blank");
+};
 
 // This is the function called when a closed folder is clicked.
 // This will open the folder, close any open menus, open this folder's menu, and close all open folders that are not part of its parent chain.
 var clickFolder = function (event) {
 
-  let clickedDiv = event.target.id;
   // Open the folder.
+  let clickedDiv = event.target.id;
   openFolder(clickedDiv);
   $(document.getElementById('' + clickedDiv)).unbind();
   $(document.getElementById('' + clickedDiv)).click(clickOpenFolder);
@@ -50,27 +75,10 @@ var clickFolder = function (event) {
     }
 };
 
-// This function is used to refresh a folder's content to reflect changes made on the back end.
-var refreshContent = function (folderId) {
-    let divId = folderId;
-
-    // Close folder content and set it to empty.
-    document.getElementById('' + divId + '-content').innerHTML = "";
-    $(document.getElementById('' + divId + '-content')).unbind();
-    $(document.getElementById('' + divId + '-content')).removeClass("open-content");
-    $(document.getElementById('' + divId + '-content')).addClass("content");
-    $(document.getElementById('' + divId)).removeClass("open-folder");
-    $(document.getElementById('' + divId)).addClass("folder");
-
-    // Reopen the folder.
-    openFolder(divId);
-    $(document.getElementById('' + divId)).unbind();
-    $(document.getElementById('' + divId)).click(clickOpenFolder);
-}
-
 // This is the function called when an open folder is clicked.
 // This will close the folder, all menus, and any folders inside of this one, the open the menu of it's parent folder.
 var clickOpenFolder = function (event) {
+
   // Close and empty folder content.
   let clickedDiv = event.target.id;
   document.getElementById('' + clickedDiv + '-content').innerHTML = "";
@@ -109,9 +117,9 @@ var clickOpenFolder = function (event) {
         }
       }
     }
-  if((document.getElementById('' + clickedDiv)).getAttribute('value') != "root") {
 
-    //If the folder is not the root folder, then open the parent folder's menu and add content.
+  //If the folder is not the root folder, then open the parent folder's menu and add content.
+  if((document.getElementById('' + clickedDiv)).getAttribute('value') != "root") {
     $(document.getElementById("" + parentId + '-menu')).append(
         '<button id="' + parentId + '-remove-folder" class="remove-folder" value="' + parentId + '"> Delete Folder </button>' +
         '<button id="' + parentId + '-add-folder" class="add-folder" value="' + parentId + '"> New Folder </button>' +
@@ -119,8 +127,8 @@ var clickOpenFolder = function (event) {
     $(document.getElementById('' + parentId + '-menu')).removeClass('menu');
     $(document.getElementById('' + parentId + '-menu')).addClass("open-menu");
   }
+  //If the folder is the root folder, reopen the folder.
   else {
-    //If the folder is the root folder, reopen the folder.
     openFolder(clickedDiv);
     $(document.getElementById('' + clickedDiv)).unbind();
     $(document.getElementById('' + clickedDiv)).click(clickOpenFolder);
@@ -160,7 +168,8 @@ var clickAddNote = function (event) {
   createPrompt('Copy and paste the URL of the note you would like to add.', confirmNoteURL);
 }
 
-// This is the function called when the remove note button is clicked. It will feed the event info to the removeNote function.
+// This is the function called when the remove note button is clicked.
+// It will feed the event info to the removeNote function.
 var clickRemoveNote = function (event) {
   let baseFolder = event.target.getAttribute('value');
   let folderNoteId = "" + event.target.id;
@@ -170,7 +179,7 @@ var clickRemoveNote = function (event) {
   createBoolPrompt("Are you sure you would like to remove this note?", removeConfirm);
 };
 
-////////////////////
+////////////////////  FUNCTIONS WITH API CALLS ////////////////////
 
 // This is the function to open a folder using an api call.
 // This will also open a folders menu and content and filling them. Additionally, this will clear and close all other menus.
@@ -363,17 +372,17 @@ var initializeRoot = function (rootId) {
   });
 };
 
-// This is the function called when the add note button is clicked. It will feed the event info to the addNote function.
-var openNote = function (event) {
-  window.open('/view/' + event.target.getAttribute("value"), "_blank");
-};
+//////////////////// POPUP FUNCTIONS ////////////////////
 
-////////////////////
-
+// This function is assigned to a prompt-box's close button.
+// It will hide the prompt box.
 var closePrompt = function() {
     document.getElementById("prompt-box").style.visibility = "hidden";
 };
 
+
+// This function fills the promp-box with parameter info and makes the prompt box visible.
+// This is used to get an input value from a user when required.
 var createPrompt = function(message, confirmFunction) {
   document.getElementById('prompt-box').style.visibility = "visible";
   document.getElementById('prompt-box').innerHTML = '<div id="prompt-close">x</div>' +
@@ -387,6 +396,8 @@ var createPrompt = function(message, confirmFunction) {
   $(document.getElementById('prompt-close')).click(closePrompt);
 };
 
+// This function fills the prompt-box with parameter info and makes the prompt box visible.
+// This is used when a user should confirm they intend to execute a function.
 var createBoolPrompt = function (message, confirmFunction) {
   document.getElementById('prompt-box').style.visibility = "visible";
   document.getElementById('prompt-box').innerHTML = '<div id="prompt-close">x</div>' +
@@ -404,10 +415,14 @@ var createBoolPrompt = function (message, confirmFunction) {
   $(document.getElementById('prompt-cancel')).click(closePrompt);
 }
 
+// This function is assigned to an error-box's close button.
+// It will hide the error box.
 var closeError = function() {
   document.getElementById("error-box").style.visibility = "hidden";
 };
 
+// This function fills the error-box with parameter info and makes the error box visible.
+// This is used to alert a user that an error has occured.
 var displayError = function(leadMessage, followMessage) {
   document.getElementById('error-box').style.visibility = "visible";
   if(followMessage) {
