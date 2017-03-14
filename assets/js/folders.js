@@ -7,18 +7,6 @@
 // For example, say the rootID is "12345", a folder named "testFolder" located inside the root folder will have an id "12345/testfolder".
 // Here is an example of a folder a few layers down, "12345/testFolder/childOfTestFolder/grandchildTestFolder".
 
-//////////////////// ONLOAD OPERATIONS ////////////////////
-
-// This handles initializing the root folder and opening it when the .js file is initially loaded.
-var rootArray = document.getElementsByClassName('root');
-for (let root of rootArray) {
-  initializeRoot(root.id);
-  $(root).click(clickFolder);
-  openFolder(root.id);
-  $(document.getElementById(root.id)).unbind();
-  $(document.getElementById(root.id)).click(clickOpenFolder);
-}
-
 //////////////////// GENERIC FUNCTIONS ////////////////////
 
 // This function is used to refresh a folder's content to reflect changes made on the back end.
@@ -173,7 +161,7 @@ var clickAddNote = function (event) {
 var clickRemoveNote = function (event) {
   let baseFolder = event.target.getAttribute('value');
   let folderNoteId = "" + event.target.id;
-  let removeConfirm = function {
+  let removeConfirm = function () {
     removeNote(baseFolder, folderNoteId);
   }
   createBoolPrompt("Are you sure you would like to remove this note?", removeConfirm);
@@ -371,6 +359,18 @@ var initializeRoot = function (rootId) {
     }
   });
 };
+
+//////////////////// ONLOAD OPERATIONS ////////////////////
+
+// This handles initializing the root folder and opening it when the .js file is initially loaded.
+var rootArray = document.getElementsByClassName('root');
+for (let root of rootArray) {
+  initializeRoot(root.id);
+  $(root).click(clickFolder);
+  openFolder(root.id);
+  $(document.getElementById(root.id)).unbind();
+  $(document.getElementById(root.id)).click(clickOpenFolder);
+}
 
 //////////////////// POPUP FUNCTIONS ////////////////////
 
