@@ -114,6 +114,12 @@ var clickOpenFolder = function (event) {
         '<button id="' + parentId + '-add-note" class="add-note" value="' + parentId + '"> Add Note </button>');
     $(document.getElementById('' + parentId + '-menu')).removeClass('menu');
     $(document.getElementById('' + parentId + '-menu')).addClass("open-menu");
+    $(document.getElementById("" + parentId + "-add-folder")).unbind();
+    $(document.getElementById("" + parentId + "-add-folder")).click(clickAddFolder);
+    $(document.getElementById("" + parentId + "-add-note")).unbind();
+    $(document.getElementById("" + parentId + "-add-note")).click(clickAddNote);
+    $(document.getElementById("" + parentId + "-remove-folder")).unbind()
+    $(document.getElementById("" + parentId + "-remove-folder")).click(clickRemoveFolder);
   }
 
   //If the folder is the root folder, reopen the folder.
