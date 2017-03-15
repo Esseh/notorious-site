@@ -4,8 +4,11 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"github.com/Esseh/retrievable"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/CORE"
+	"github.com/Esseh/notorious-dev/AUTH"
+	"github.com/Esseh/notorious-dev/BACKUP"
 	"github.com/Esseh/notorious-dev/NOTES"
 	"github.com/Esseh/notorious-dev/PATHS"
 	"github.com/Esseh/notorious-dev/USERS"
@@ -18,6 +21,27 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.GET(PATHS.NOTES_View, NOTES_GET_View)
 	r.GET(PATHS.NOTES_Editor, NOTES_GET_Editor)
 	r.POST(PATHS.NOTES_Edit, NOTES_POST_Editor)
+	r.GET("/backup/:NoteID", NOTES_GET_Backups)
+}
+
+func NOTES_GET_Backups(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+	ctx := CONTEXT.NewContext(res,req)
+	if !ctx.AssertLoggedInFailed() {
+		// Good ID
+		i,err := strconv.ParseInt(params.ByName("NoteID"),10,64)
+		if err == nil {
+			// Note Exists
+			err := retrievable.GetEntity(ctx,i,&NOTES.Note{})
+			if err == nil {
+				ref := AUTH.EmailReference{}
+				if retrievable.GetEntity(ctx,req.FormValue("TargetEmail"),&ref) != nil { ref = AUTH.EmailReference{} }
+				CORE.ServeTemplateWithParams(res, "getbackups", struct{ 
+					HeaderData CONTEXT.HeaderData 
+					Backup NOTES.Content
+				}{*MakeHeader(ctx),BACKUP.RetrieveBackup(ctx,i,ref.UserID)})
+			}
+		}
+	}
 }
 
 func NOTES_GET_New(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
@@ -125,17 +149,21 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 		edit, boolConversionError := strconv.ParseBool(req.FormValue("publicedit"))
 		view, _ := strconv.ParseBool(req.FormValue("publicview"))
 		if !ctx.ErrorPage("Internal Server Error (1)", boolConversionError, http.StatusSeeOther) {
+			content := NOTES.Content{
+				Content: CORE.EscapeString(req.FormValue("note")),
+				Title:   req.FormValue("title"),
+			}
 			err := NOTES.UpdateNoteContent(ctx, req.FormValue("notekey"),
-				NOTES.Content{
-					Content: CORE.EscapeString(req.FormValue("note")),
-					Title:   req.FormValue("title"),
-				},
+				content,
 				NOTES.Note{
 					Collaborators:      FindCollaborators(ctx,req.FormValue("collaborators")),
 					PublicallyEditable: edit,
 					PublicallyViewable: view,
 				},
 			)
+			noteid , _ := strconv.ParseInt(req.FormValue("notekey"),10,64)	
+			b := BACKUP.Backup(content)
+			BACKUP.UpdateBackup(ctx,noteid,int64(ctx.User.IntID),&b)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 				ctx.Redirect("/view/" + req.FormValue("notekey"))
 			}
