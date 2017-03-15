@@ -154,6 +154,7 @@
 .open-menu {
  border:solid;
  border-color:white;
+ background-color: #ECF0F1;
 }
 
 .note-container:hover {
