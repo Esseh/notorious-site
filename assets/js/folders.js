@@ -115,6 +115,7 @@ var clickOpenFolder = function (event) {
     $(document.getElementById('' + parentId + '-menu')).removeClass('menu');
     $(document.getElementById('' + parentId + '-menu')).addClass("open-menu");
   }
+
   //If the folder is the root folder, reopen the folder.
   else {
     openFolder(clickedDiv);
@@ -242,7 +243,10 @@ var openFolder = function (folderID) {
         displayError("A database error has occured.");
       }
     }
+  }).fail(function () {
+    displayError("Post request failed.");
   });
+    // Uh oh, something went wrong;
 };
 
 // This funcion makes an api call to add a folder with the given parameters.
@@ -255,7 +259,7 @@ var addFolder = function (parentId, folderName) {
     }
     else {
       if (dataObj.code == 0) {
-        displayError("An error has occured.", "Enure that a folder of the same name does not already exist in the parent folder.");
+        displayError("An error has occured.", "Ensure that a folder of the same name does not already exist in the parent folder.");
       }
       if (dataObj.code == 1) {
         displayError("A database error has occured.");
@@ -267,6 +271,8 @@ var addFolder = function (parentId, folderName) {
         displayError("You do not own the parent folder.");
       }
     }
+  }).fail(function () {
+    displayError("Post request failed.");
   });
 };
 
@@ -292,6 +298,8 @@ var removeFolder = function (parentId, folderName) {
         displayError("The folder is ROOT", "You cannot delete your base folder.");
       }
     }
+  }).fail(function () {
+    displayError("Post request failed.");
   });
 };
 
@@ -315,6 +323,8 @@ var addNote = function (parentId, noteId) {
         displayError("You do not own the parent folder.");
       }
     }
+  }).fail(function () {
+    displayError("Post request failed.");
   });
 };
 
@@ -339,6 +349,8 @@ var removeNote = function (parentId, folderNoteId) {
           displayError("You do not own the parent folder.");
         }
       }
+    }).fail(function () {
+      displayError("Post request failed.");
     });
 };
 
@@ -357,6 +369,8 @@ var initializeRoot = function (rootId) {
         displayError("The ID of the root folder does not match the ID of the user.");
       }
     }
+  }).fail(function () {
+    displayError("Post request failed.");
   });
 };
 
