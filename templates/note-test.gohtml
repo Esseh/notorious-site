@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+{{define "note-test"}}
+<html>
+  <head>
+    <title>Learning Go</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+
+  {{range $index, $value := .Array}}
+    {{$value}}
+  {{end}}
+  <br>
+    {{.}}
+    {{if .FalseString}}
+    {{.HelloString}}
+  {{else}}
+    Goodbye World
+  {{end}}
+  </body>
+</html>
+{{end}}

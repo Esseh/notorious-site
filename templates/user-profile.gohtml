@@ -10,9 +10,11 @@
 		<title>Project NoteOrious</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="/assets/css/main.css" />
 		<link rel="stylesheet" href="/assets/css/user-profile.css" />
+    <link rel="stylesheet" href="/assets/css/folders.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
 		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
 	</head>
@@ -52,6 +54,16 @@
 					</header>
 
 				<!-- Main -->
+
+				  <div id="folder-window">
+            <div id="{{.Root}}" class ="folder root" value="root"> Folders </div>
+              <div id="{{.Root}}-menu" class="menu"></div>
+              <div id="{{.Root}}-content" class="content">
+              </div>
+            <div id="prompt-box"></div>
+            <div id="error-box"></div>
+          </div>
+
 					<div id="main">
 						{{ $d := .Data}}
 						{{ $u := .User}}
@@ -84,6 +96,7 @@
 			<script src="/public/assets/js/util.js"></script>
 			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
 			<script src="/public/assets/js/main.js"></script>
+			<script src="../assets/js/folders.js"></script>
 
 	</body>
 	{{end}}
