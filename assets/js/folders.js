@@ -11,20 +11,20 @@
 
 // This function is used to refresh a folder's content to reflect changes made on the back end.
 var refreshContent = function (folderId) {
-    let divId = folderId;
+  let divId = folderId;
 
-    // Close folder content and set it to empty.
-    document.getElementById('' + divId + '-content').innerHTML = "";
-    $(document.getElementById('' + divId + '-content')).unbind();
-    $(document.getElementById('' + divId + '-content')).removeClass("open-content");
-    $(document.getElementById('' + divId + '-content')).addClass("content");
-    $(document.getElementById('' + divId)).removeClass("open-folder");
-    $(document.getElementById('' + divId)).addClass("folder");
+  // Close folder content and set it to empty.
+  document.getElementById('' + divId + '-content').innerHTML = "";
+  $(document.getElementById('' + divId + '-content')).unbind();
+  $(document.getElementById('' + divId + '-content')).removeClass("open-content");
+  $(document.getElementById('' + divId + '-content')).addClass("content");
+  $(document.getElementById('' + divId)).removeClass("open-folder");
+  $(document.getElementById('' + divId)).addClass("folder");
 
-    // Reopen the folder.
-    openFolder(divId);
-    $(document.getElementById('' + divId)).unbind();
-    $(document.getElementById('' + divId)).click(clickOpenFolder);
+  // Reopen the folder.
+  openFolder(divId);
+  $(document.getElementById('' + divId)).unbind();
+  $(document.getElementById('' + divId)).click(clickOpenFolder);
 }
 
 //////////////////// ONCLICK FUNCTIONS ////////////////////
@@ -82,11 +82,11 @@ var clickOpenFolder = function (event) {
 
   // Empty and close all menus.
   let menuDivs = (document.getElementsByClassName("open-menu"));
-    for (let menuDiv of menuDivs) {
-      menuDiv.innerHTML = "";
-      $(menuDiv).removeClass('open-menu');
-      $(menuDiv).addClass('menu');
-    }
+  for (let menuDiv of menuDivs) {
+    menuDiv.innerHTML = "";
+    $(menuDiv).removeClass('open-menu');
+    $(menuDiv).addClass('menu');
+  }
 
   // Close and empty all open folders that are not part of the parent chain.
   let parentId = document.getElementById(clickedDiv).getAttribute('value');
@@ -145,9 +145,9 @@ var clickAddFolder = function (event) {
 // This will take the click event info and feed it into the removeFolder function.
 var clickRemoveFolder = function (event) {
   let confirmFolderName = function() {
-  let inputValue = document.getElementById('prompt-input').value;
-  let baseFolder = event.target.value;
-  removeFolder(baseFolder, inputValue);
+    let inputValue = document.getElementById('prompt-input').value;
+    let baseFolder = event.target.value;
+    removeFolder(baseFolder, inputValue);
   }
   createPrompt('Enter the name of the folder you would like to delete.', confirmFolderName);
 }
@@ -156,9 +156,9 @@ var clickRemoveFolder = function (event) {
 // This will take the click event info and feed it into the addNote function.
 var clickAddNote = function (event) {
   let confirmNoteURL = function() {
-  let inputValue = document.getElementById('prompt-input').value;
-  let baseFolder = event.target.value;
-  addNote(baseFolder, inputValue);
+    let inputValue = document.getElementById('prompt-input').value;
+    let baseFolder = event.target.value;
+    addNote(baseFolder, inputValue);
   }
   createPrompt('Copy and paste the URL of the note you would like to add.', confirmNoteURL);
 }
@@ -183,7 +183,6 @@ var openFolder = function (folderID) {
   $.post('/folder/api/openfolder', { FolderID: idString }, function (data) {
     let dataObj = $.parseJSON(data);
     if(dataObj.success == true) {
-
       let parentId = document.getElementById("" + folderID).getAttribute('value');
 
       // Set all open-menus to menus and clear them.
@@ -193,6 +192,7 @@ var openFolder = function (folderID) {
           $(menuDiv).removeClass('open-menu');
           $(menuDiv).addClass('menu');
         }
+
       // Change the current folders menu to open and add its content.
       $(document.getElementById("" + folderID + '-menu')).append(
           '<button id="' + folderID + '-remove-folder" class="remove-folder" value="' + folderID + '"> Delete Folder </button>' +
@@ -380,24 +380,12 @@ var initializeRoot = function (rootId) {
   });
 };
 
-//////////////////// ONLOAD OPERATIONS ////////////////////
-
-// This handles initializing the root folder and opening it when the .js file is initially loaded.
-var rootArray = document.getElementsByClassName('root');
-for (let root of rootArray) {
-  initializeRoot(root.id);
-  $(root).click(clickFolder);
-  openFolder(root.id);
-  $(document.getElementById(root.id)).unbind();
-  $(document.getElementById(root.id)).click(clickOpenFolder);
-}
-
 //////////////////// POPUP FUNCTIONS ////////////////////
 
 // This function is assigned to a prompt-box's close button.
 // It will hide the prompt box.
 var closePrompt = function() {
-    document.getElementById("prompt-box").style.visibility = "hidden";
+  document.getElementById("prompt-box").style.visibility = "hidden";
 };
 
 
@@ -455,5 +443,18 @@ var displayError = function(leadMessage, followMessage) {
   }
   $(document.getElementById('error-close')).click(closeError);
 };
+
+//////////////////// ONLOAD OPERATIONS ////////////////////
+
+// This handles initializing the root folder and opening it when the .js file is initially loaded.
+var rootArray = document.getElementsByClassName('root');
+for (let root of rootArray) {
+  initializeRoot(root.id);
+  $(root).click(clickFolder);
+  openFolder(root.id);
+  $(document.getElementById(root.id)).unbind();
+  $(document.getElementById(root.id)).click(clickOpenFolder);
+}
+
 
 }
