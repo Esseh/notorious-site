@@ -58,12 +58,13 @@
 
 
 <div class="row">
-	<input type="button" value = "Save Note" id = "clickMe"></input>
-<p><br>
- <input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label>
- <input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label>
-</p>
-</div>
+	<label>Add Collaborators (seperate IDs with colons):</label>
+	<input name="writingtext" type="hidden">
+	<input type = "text" name="collab" id="collab">
+	<br>
+	<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
+	<p><br><input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label></p>
+	<input type="button" value = "Save Note" id = "clickMe"></input></div>
 
 </div>
 
@@ -73,17 +74,27 @@
 
 <!-- Initialize Quill editor -->
 <script>
-publicallyeditable: document.getElementById('publiclyviewable').checked = true;
-publicallyeditable: document.getElementById('publiclyeditable').checked = true;
-document.getElementById("clickMe").onclick = function () { 
-	post('/new',{
-		title: document.getElementById("title").value ,
-		note: editor.container.firstChild.innerHTML, 
-		publicallyeditable: document.getElementById('publiclyeditable').checked.toString(),
-		publicallyviewable: document.getElementById('publiclyviewable').checked.toString(),
-		}); 
-	};
-
+document.getElementById("clickMe").onclick = function () {
+	var checkedValue = document.getElementById("publiclyeditable").checked;
+	if (!checkedValue){
+		checkedValue = false;
+	} else {
+		checkedValue = true;
+	}
+	var strchecked = checkedValue.toString();
+	var checkedValue2 = document.getElementById("publiclyviewable").checked;
+	if (!checkedValue2){
+		checkedValue2 = false;
+	} else {
+		checkedValue2 = true;
+	}
+	var strchecked2 = checkedValue2.toString();
+	post('/new',{title: document.getElementById("title").value ,
+	note: editor.container.firstChild.innerHTML,
+	collaborators: document.getElementById("collab").value,
+	publicedit: strchecked,
+	publicview: strchecked2,})
+};
 
 
 var toolbarOptions = [

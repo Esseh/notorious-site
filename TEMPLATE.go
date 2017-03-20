@@ -3,12 +3,13 @@ package main
 import (
 	"html/template"
 	"math/rand"
-
+	"strings"
+	"github.com/Esseh/notorious-dev/AUTH"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
+	"github.com/Esseh/notorious-dev/NOTES"
 	"github.com/Esseh/notorious-dev/USERS"
-	"github.com/Esseh/notorious-dev/NOTES"	
 	"github.com/Esseh/retrievable"
 	humanize "github.com/dustin/go-humanize" // russross markdown parser
 	appcontext "golang.org/x/net/context"
@@ -33,6 +34,10 @@ func init() {
 		"getMod":        GetMod,
 		"canEditNote":	 NOTES.CanEditNote,
 		"canViewNote":	 NOTES.CanViewNote,
+		"findCollabs":   FindCollaborators,
+		"canEdit":       NOTES.CanEditNote,
+		"canView":       NOTES.CanViewNote,
+		"getEmail":		 GetEmail,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
@@ -43,6 +48,27 @@ func init() {
 func GetMod(a int64) int64 {
 	rand.Seed(a)
 	return int64(rand.Uint32()) % 10
+}
+
+func GetEmail(ctx appcontext.Context, userID int64) string {
+	u := USERS.User{}
+	retrievable.GetEntity(ctx,userID,&u)
+	return u.Email
+}
+
+func FindCollaborators(ctx CONTEXT.Context,c string) []int64 {
+	dupCheck := make(map[int64]bool)
+	temp := strings.Split(c, ":")
+	var collabs []int64
+	for _, x := range temp {
+		nextEntry := AUTH.EmailReference{}
+		err := retrievable.GetEntity(ctx,x,&nextEntry)
+		if (err == nil) && (!dupCheck[nextEntry.UserID]) {
+			collabs = append(collabs, nextEntry.UserID)
+			dupCheck[nextEntry.UserID] = true
+		}
+	}
+	return collabs
 }
 
 func GetUserFromID(ctx appcontext.Context, id int64) (*USERS.User, error) {

@@ -58,11 +58,16 @@
 
 
 <div class="row">
+	{{if eq .User.IntID .Owner.IntID}}
+		{{$ctx := .HeaderData.Ctx }}
+	<label>Add Collaborators (seperate IDs with colons):</label>
+	<input name="writingtext" type="hidden">
+	<input type = "text" name="collab" value="{{range $i, $e := .NoteData.Collaborators}}{{getEmail $ctx $e}}:{{end}}" id="collab">
+	<br>
+	<p><br><input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label></p>
+	<p><br><input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label></p>
+	{{end}}
 	<input type="button" value = "Save Note" id = "clickMe"></input>
-<p {{if (ne .NoteData.OwnerID (toInt .HeaderData.User.IntID))}}hidden{{end}}><br>
-	<input type="checkbox" id="publiclyviewable" /><label for="publiclyviewable"><span class="ui"></span>publicly viewable</label>
-	<input type="checkbox" id="publiclyeditable" /><label for="publiclyeditable"><span class="ui"></span>publicly editable</label>
-</p>
 </div>
 
 </div>
@@ -73,17 +78,44 @@
 
 <!-- Initialize Quill editor -->
 <script>
-document.getElementById("publiclyeditable").checked = {{.NoteData.PublicallyEditable}};
-document.getElementById("publiclyviewable").checked = {{.NoteData.PublicallyViewable}};
 
+{{if eq .User.IntID .Owner.IntID}}
+if({{.NoteData.PublicallyEditable}}){
+	document.getElementById("publiclyeditable").checked = true;
+}
+if({{.NoteData.PublicallyViewable}}){
+	document.getElementById("publiclyviewable").checked = true;
+}
+{{ end }}
 document.getElementById("clickMe").onclick = function () {
-	post('/edit/',{
-		title: document.getElementById("title").value,
-		note: editor.container.firstChild.innerHTML,
-		publiclyeditable: checkedValue = document.getElementById("publiclyeditable").checked.toString(),
-		publiclyviewable: checkedValue = document.getElementById("publiclyviewable").checked.toString(),
-		notekey: {{.Notekey}}
-	})
+	{{if eq .User.IntID .Owner.IntID}}
+	var checkedValue = document.getElementById("publiclyeditable").checked;
+	if (!checkedValue){
+		checkedValue = false;
+	} else {
+		checkedValue = true;
+	}
+	var strchecked = checkedValue.toString();
+	var checkedValue2 = document.getElementById("publiclyviewable").checked;
+	if (!checkedValue2){
+		checkedValue2 = false;
+	} else {
+		checkedValue2 = true;
+	}
+	var strchecked2 = checkedValue2.toString();
+	{{end}}
+	post('/edit/',{title: document.getElementById("title").value ,
+	note: editor.container.firstChild.innerHTML,
+	{{if eq .User.IntID .Owner.IntID}}
+	collaborators: document.getElementById("collab").value,
+	publicedit: strchecked,
+	publicview: strchecked2,
+	{{else}}
+	collaborators: "",
+	publicedit: {{.NoteData.PublicallyEditable}},
+	publicview: {{.NoteData.PublicallyViewable}},
+	{{end}}
+	notekey: {{.Notekey}}})
 };
 
 var toolbarOptions = [
