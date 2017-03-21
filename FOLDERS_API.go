@@ -25,4 +25,7 @@ func INIT_FOLDERS_API(r *httprouter.Router) {
 	r.POST("/folder/api/initializeroot", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
 		fmt.Fprint(res,FOLDERS.InitializeRoot(CONTEXT.NewContext(res,req)))
 	})
+	r.POST("/folder/api/renamefolder", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+		fmt.Fprint(res,FOLDERS.RenameFolder(CONTEXT.NewContext(res,req)))
+	})
 }
