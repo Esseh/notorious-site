@@ -7,6 +7,9 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="assets/css/profile-settings.css">
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link  href="/assets/css/cropper.css" rel="stylesheet">
+    <script>
+    </script>
     </head>
 <body>
 {{ template "header" .}}
@@ -16,29 +19,42 @@
     <!-- edit form column -->
     <div class= "change-avatar">
       <h3>Avatar Image:</h3>
-
-      <form id="edit-avatar-form" action="/editprofileavatar" method="POST"
-      enctype="multipart/form-data">
-      <div id="avatar-info">
-      {{if .User.Avatar}}
-      <img src="{{getAvatarURL .User.IntID}}" alt="Avatar Image" class="user-avatar">
-      {{else}}
-      <svg class="user-avatar">
-        <use xlink:href="#svg-user"></use>
-      </svg>
-      {{end}}
-    </div>
-  <div class="button-container">
-    <label class="button blue-btn">
-    {{if .User.Avatar}}
-    Change Avatar
-    {{else}}
-    Upload Avatar
-    {{end}}
-    <input name="avatar" id="avatar-input" type="file" name="avatar" accept=".jpg,.png,.jpeg" onchange='this.form.submit();'>
-    </label>
-  </div>
-</form>
+      <div class="modal-body">
+        <div class="crop-container"><canvas id="js-cropper-canvas"></canvas></div>
+        <div class="js-crop-controls">
+          <button id="js-crop-rotate" class="purple-btn" value="0">Rotate</button>
+          <span class="cropper-zoom">
+            <svg>
+              <use xlink:href="#svg-thumbnail"></use>
+            </svg>
+            <input type="range" id="js-crop-zoom" min="0.0" max="5.0" step="0.01" value="1" autocomplete="off">
+            <svg>
+              <use xlink:href="#svg-thumbnail"></use>
+            </svg>
+          </span>
+          <div></div>
+        </div>
+        <div class="cropper-button-container button-container">
+          <label for="js-cropper-input" class="js-cropper-filename cropper-image-filename">No File Chosen...</label>
+           <label for="js-cropper-input" class="button blue-btn">
+            Browse
+          </label>
+        </div>
+      </div>
+      <form data-form_type="avatar" id="edit-avatar-form" class="js-cropper-form js-form" action="/editprofileavatar" method="POST" enctype="multipart/form-data">
+          <div id="avatar-info">
+              <div class="button-container">
+                  <input id="js-cropper-input" class="avatar-image" name="avatar" type="file"
+                  accept=".jpg,.png,.jpeg" alt="Picture">
+                  <input id="js-posx" type="hidden" name="posx" value="0">
+                  <input id="js-posy" type="hidden" name="posy" value="0">
+                  <input id="js-cropwidth" type="hidden" name="cropwidth" value="0">
+                  <input id="js-cropheight" type="hidden" name="cropheight" value="0">
+                  <input id="js-degrees" type="hidden" name="degrees" value="0">
+                  <input id="js-cropper-submit" type="submit">
+              </div>
+          </div>
+      </form>
 </div>
 
       <form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data">
@@ -78,5 +94,6 @@
   </div>
 
     </body>
+<script src="/assets/js/cropper.js"></script>
 </html>
 {{end}}

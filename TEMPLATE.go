@@ -1,17 +1,25 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
+	"image"
+	"image/jpeg"
+	"io"
 	"math/rand"
+	"mime/multipart"
 	"strings"
 	"github.com/Esseh/notorious-dev/AUTH"
+	"github.com/Esseh/notorious-dev/CLOUD"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/NOTES"
 	"github.com/Esseh/notorious-dev/USERS"
 	"github.com/Esseh/retrievable"
+	"github.com/disintegration/imaging"
 	humanize "github.com/dustin/go-humanize" // russross markdown parser
+	"github.com/pkg/errors"
 	appcontext "golang.org/x/net/context"
 )
 
@@ -43,6 +51,14 @@ func init() {
 	} // Load up all templates.
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
+}
+
+type CropBounds struct {
+	X         int
+	Y         int
+	W         int
+	H         int
+	RotateDeg int
 }
 
 func GetMod(a int64) int64 {
@@ -96,4 +112,43 @@ func MakeHeader(ctx CONTEXT.Context) *CONTEXT.HeaderData {
 	return &CONTEXT.HeaderData{
 		ctx, ctx.User, redirectURL,
 	}
+}
+
+//resize
+func resizeImage(imgRdr io.Reader, x, y, width, height, finalWidth, finalHeight, rotateDeg int) (io.Reader, error) {
+	img, _, err := image.Decode(imgRdr)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to parse image")
+	}
+
+	var rotated *image.NRGBA
+	switch rotateDeg {
+	case 90:
+		rotated = imaging.Rotate270(img)
+	case 180:
+		rotated = imaging.Rotate180(img)
+	case 270:
+		rotated = imaging.Rotate90(img)
+	default:
+		rotated = imaging.Clone(img)
+	}
+
+	cropRect := image.Rect(x, y, x+width, y+height).Add(rotated.Bounds().Min)
+	cropped := imaging.Crop(rotated, cropRect)
+
+	resized := imaging.Resize(cropped, finalWidth, finalHeight, imaging.Lanczos)
+
+	buf := &bytes.Buffer{}
+	err = jpeg.Encode(buf, resized, nil)
+	return buf, errors.Wrap(err, "Unable to convert to jpeg")
+}
+
+//upload
+func uploadImage(ctx CONTEXT.Context, userID int64, header *multipart.FileHeader, cb *CropBounds, avatarReader io.ReadSeeker) error {
+	imgRdr, err := resizeImage(avatarReader, cb.X, cb.Y, cb.W, cb.H, 500, 500, cb.RotateDeg)
+	if err != nil {
+		return errors.Wrap(err, "Resize image")
+	}
+	filename := CORE.GetAvatarPath(userID)
+	return CLOUD.AddFile(ctx, filename, header.Header["Content-Type"][0], imgRdr)
 }

@@ -1,0 +1,48 @@
+{{define "cropper-modal"}}
+<div class="modal">
+	<input type="checkbox" class="modal-checkbox" id="cropper-modal-checkbox" autocomplete="off">
+	<div class="modal-container">
+	  <label for="cropper-modal-checkbox" class="modal-blur-bg"></label>
+	  <div class="modal-content cropper-modal">
+	      <div class="modal-header">
+	          <h4>Upload Picture</h4>
+	          <label for="cropper-modal-checkbox" class="close-modal">
+	              <svg>
+                	<use xlink:href="#svg-thin-close"></use>
+              	 </svg>
+	          </label>
+	      </div>
+	      <div class="modal-body">
+	        <div class="crop-container"><canvas id="js-cropper-canvas"></canvas></div>
+	        <div class="js-crop-controls">
+	          <button id="js-crop-rotate" class="purple-btn" value="0">Rotate</button>
+	          <span class="cropper-zoom">
+	          	<svg>
+	            	<use xlink:href="#svg-thumbnail"></use>
+	            </svg>
+	          	<input type="range" id="js-crop-zoom" min="0.0" max="5.0" step="0.01" value="1" autocomplete="off">
+	          	<svg>
+	            	<use xlink:href="#svg-thumbnail"></use>
+	            </svg>
+	          </span>
+	          <div></div>
+	        </div>
+	        <div class="cropper-button-container button-container">
+	          <label for="js-cropper-input" class="js-cropper-filename cropper-image-filename">No File Chosen...</label>
+	           <label for="js-cropper-input" class="button blue-btn">
+	            Browse
+	          </label>
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	          <div class="button-container">
+	              <label class="button red-btn" for="cropper-modal-checkbox">Close</label>
+	              <label class="button blue-btn js-cropper-submit-label" for="js-cropper-submit">
+	                Save
+	              </label>
+	          </div>
+	      </div>
+	  </div>
+	</div>
+</div>
+{{end}}
