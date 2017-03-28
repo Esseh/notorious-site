@@ -80,18 +80,37 @@ func USERS_POST_ProfileEdit(res http.ResponseWriter, req *http.Request, params h
 func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ctx := CONTEXT.NewContext(res, req)
 	user, _ := USERS.GetUserFromSession(ctx, req)
-	rdr, hdr, err := req.FormFile("avatar")
-	if !ctx.ErrorPage("upload image thingy", err, http.StatusBadRequest) {
-		defer rdr.Close()
+	avatarImg, hdr, err := req.FormFile("avatar")
+	if err != nil {
+		return
+	}
+	defer avatarImg.Close()
+	posX, _ := strconv.Atoi(req.FormValue("posx"))
+	posY, _ := strconv.Atoi(req.FormValue("posy"))
+	cropWidth, err := strconv.Atoi(req.FormValue("cropwidth"))
+	if err != nil {
+		cropWidth = 500
+	}
+	cropHeight, err := strconv.Atoi(req.FormValue("cropheight"))
+	if err != nil {
+		cropHeight = 500
+	}
+	rotate, _ := strconv.Atoi(req.FormValue("degrees"))
+	cb := CropBounds{
+		X:         posX,
+		Y:         posY,
+		W:         cropWidth,
+		H:         cropHeight,
+		RotateDeg: rotate,
+	}
+	err2 := uploadImage(ctx, int64(user.IntID), hdr, &cb, avatarImg)
+	if err2 != nil {
+		fmt.Fprint(res, err2)
+	} else {
 		user.Avatar = true
-		err2 := USERS.UploadAvatar(ctx, int64(user.IntID), hdr, rdr)
-		if err2 != nil {
-			fmt.Fprint(res, err2)
-		} else {
-			_, err = retrievable.PlaceEntity(ctx, user.IntID, user)
-			if !ctx.ErrorPage("server error placing key", err, http.StatusBadRequest) {
-				http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(user.IntID), 10), http.StatusSeeOther)
-			}
+		_, err = retrievable.PlaceEntity(ctx, user.IntID, user)
+		if !ctx.ErrorPage("server error placing key", err, http.StatusBadRequest) {
+			http.Redirect(res, req, "/profile/"+strconv.FormatInt(int64(user.IntID), 10), http.StatusSeeOther)
 		}
 	}
 }

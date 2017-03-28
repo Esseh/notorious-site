@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
 	"github.com/Esseh/retrievable"
+	"github.com/Esseh/notorious-dev/RATINGS"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/AUTH"
@@ -22,6 +24,12 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.GET(PATHS.NOTES_Editor, NOTES_GET_Editor)
 	r.POST(PATHS.NOTES_Edit, NOTES_POST_Editor)
 	r.GET("/backup/:NoteID", NOTES_GET_Backups)
+	r.POST("/note/api/getrating", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+		fmt.Fprint(res,RATINGS.GetRating(CONTEXT.NewContext(res,req)))
+	})
+	r.POST("/note/api/setrating", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+		fmt.Fprint(res,RATINGS.SetRating(CONTEXT.NewContext(res,req)))
+	})
 }
 
 func NOTES_GET_Backups(res http.ResponseWriter, req *http.Request, params httprouter.Params){

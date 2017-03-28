@@ -78,3 +78,11 @@ img.user-avatar {
 label.col-lg-3.control-label {
     margin: 1em;
 }
+
+input#js-cropper-input {
+    display: none;
+}
+
+div#avatar-info {
+    width: 500px;
+}
