@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"google.golang.org/appengine/log"
-
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/NOTES"
@@ -103,7 +101,6 @@ func USERS_POST_ProfileEditAvatar(res http.ResponseWriter, req *http.Request, pa
 		H:         cropHeight,
 		RotateDeg: rotate,
 	}
-	log.Infof(ctx, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 	err2 := uploadImage(ctx, int64(user.IntID), hdr, &cb, avatarImg)
 	if err2 != nil {
 		fmt.Fprint(res, err2)
