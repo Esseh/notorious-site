@@ -30,6 +30,9 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.POST("/note/api/setrating", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
 		fmt.Fprint(res,RATINGS.SetRating(CONTEXT.NewContext(res,req)))
 	})
+	r.POST("/note/api/copynote", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+		fmt.Fprint(res,NOTES.API_SaveCopy(CONTEXT.NewContext(res,req)))
+	})
 }
 
 func NOTES_GET_Backups(res http.ResponseWriter, req *http.Request, params httprouter.Params){
