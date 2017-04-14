@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+{{define "private-message"}}
+<html>
+	<head>
+	</head>
+	<body>
+		{{range $i, $v := .Messages}}
+			<p>
+				<p>Sent By: {{$v.Sender}}</p>
+				<p>Received By: {{$v.Receiver}}</p>
+				<p>Title: {{$v.Title}}</p>
+				<p>Body: {{$v.Content}}</p>
+				<p>Date Sent: {{humanize $v.DateSent}}</p>
+			</p>
+		{{end}}
+		<a href = "/pm?Page={{decPage .PageNumber}}">Newer Messages</a>
+		<a href = "/pm?Page={{incPage .PageNumber}}">Older Messages</a> 
+		<br>
+		<form action="/pm" method="post">
+			To: <input type = "text" name = "Receiver"> <br>
+			Title: <input type = "text" name = "Title"> <br>
+			Content <input type = "test" name = "Body"> <br>
+			<input type = "submit">
+		</form>
+	</body>
+</html>
+{{end}}

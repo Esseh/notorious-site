@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"math/rand"
 	"strings"
+	"github.com/Esseh/notorious-dev/PM"
 	"github.com/Esseh/notorious-dev/AUTH"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
@@ -38,12 +39,22 @@ func init() {
 		"canEdit":       NOTES.CanEditNote,
 		"canView":       NOTES.CanViewNote,
 		"getEmail":		 GetEmail,
+		"retrieveMessages": PM.RetrieveMessages,
+		"getPageNumbers": PM.GetPageNumbers,
+		"incPage": IncPage,
+		"decPage": DecPage,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
 }
+
+func DecPage(i int64) int64 {
+	if i == 0 { return 0 }
+	return i - 1 
+}
+func IncPage(i int64) int64 { return i + 1 }
 
 func GetMod(a int64) int64 {
 	rand.Seed(a)

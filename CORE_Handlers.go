@@ -32,4 +32,5 @@ func InitializeHandlers(router *httprouter.Router) {
 	INIT_USERS_HANDLERS(router)
 	INIT_NOTES_HANDLERS(router)
 	INIT_FOLDERS_API(router)
+	INIT_PM_HANDLERS(router)
 }
