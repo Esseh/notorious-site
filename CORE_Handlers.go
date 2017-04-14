@@ -2,11 +2,11 @@ package main
 
 import (
 	"net/http"
-
+	"github.com/julienschmidt/httprouter"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/CORE"
-	"github.com/julienschmidt/httprouter"
 )
+
 
 // Multiplexer Function for CORE
 func Handle_CORE(r *httprouter.Router) {
@@ -15,8 +15,8 @@ func Handle_CORE(r *httprouter.Router) {
 
 // Serves the index page.
 func index(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	ctx := CONTEXT.NewContext(res, req)
-	CORE.ServeTemplateWithParams(res, "index", struct{ CONTEXT.HeaderData }{*MakeHeader(ctx)})
+	ctx := CONTEXT.NewContext(res,req)
+	CORE.ServeTemplateWithParams(res, "index", struct { CONTEXT.HeaderData }{ *MakeHeader(ctx), })
 }
 
 func init() {
@@ -32,4 +32,5 @@ func InitializeHandlers(router *httprouter.Router) {
 	INIT_USERS_HANDLERS(router)
 	INIT_NOTES_HANDLERS(router)
 	INIT_FOLDERS_API(router)
+	INIT_PM_HANDLERS(router)
 }
