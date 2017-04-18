@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"mime/multipart"
 	"strings"
+	"github.com/Esseh/notorious-dev/PM"
 	"github.com/Esseh/notorious-dev/AUTH"
 	"github.com/Esseh/notorious-dev/CLOUD"
 	"github.com/Esseh/notorious-dev/CONTEXT"
@@ -46,6 +47,10 @@ func init() {
 		"canEdit":       NOTES.CanEditNote,
 		"canView":       NOTES.CanViewNote,
 		"getEmail":		 GetEmail,
+		"retrieveMessages": PM.RetrieveMessages,
+		"getPageNumbers": PM.GetPageNumbers,
+		"incPage": IncPage,
+		"decPage": DecPage,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
@@ -60,6 +65,11 @@ type CropBounds struct {
 	H         int
 	RotateDeg int
 }
+func DecPage(i int64) int64 {
+	if i == 0 { return 0 }
+	return i - 1 
+}
+func IncPage(i int64) int64 { return i + 1 }
 
 func GetMod(a int64) int64 {
 	rand.Seed(a)
