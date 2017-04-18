@@ -53,6 +53,7 @@ func init() {
 		"decPage": DecPage,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
+		"getSubscriptions": NOTES.GetSubscriptions,
 	} // Load up all templates.
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
