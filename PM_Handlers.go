@@ -29,6 +29,7 @@ func INIT_PM_HANDLERS(r *httprouter.Router) {
 	r.POST("/pm", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
 		ctx := CONTEXT.NewContext(res,req)
 		PM.SendMessage(ctx,req.FormValue("Receiver"),req.FormValue("Title"),req.FormValue("Body"))
+		PM.Notify(ctx,req.FormValue("Receiver"))
 		ctx.Redirect("/pm")
 	})
 }
