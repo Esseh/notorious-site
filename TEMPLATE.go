@@ -16,6 +16,7 @@ import (
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/NOTES"
+	"github.com/Esseh/notorious-dev/FORUM"
 	"github.com/Esseh/notorious-dev/NOTIFICATION"
 	"github.com/Esseh/notorious-dev/USERS"
 	"github.com/Esseh/retrievable"
@@ -56,6 +57,11 @@ func init() {
 		"parse": CORE.EscapeString,
 		"getSubscriptions": NOTES.GetSubscriptions,
 		"getNotifications": NOTIFICATION.GetNotifications,
+		"isAdmin" : FORUM.IsAdmin,
+		"getCategories" : FORUM.GetCategories,
+		"getForums"  : FORUM.GetForums,
+		"getThreads" : FORUM.GetThreads,
+		"getPosts" : FORUM.GetPosts,
 	} // Load up all templates.
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))

@@ -27,6 +27,7 @@ func init() {
 
 func InitializeHandlers(router *httprouter.Router) {
 	Handle_CORE(router)
+	INIT_FORUM_HANDLERS(router)
 	INIT_NOTIFICATION_API(router)
 	INIT_AUTH_HANDLERS(router)
 	INIT_OAUTH_Handlers(router)
