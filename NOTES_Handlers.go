@@ -30,6 +30,9 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.POST("/note/api/setrating", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
 		fmt.Fprint(res,RATINGS.SetRating(CONTEXT.NewContext(res,req)))
 	})
+	r.POST("/note/api/copynote", func(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+		fmt.Fprint(res,NOTES.API_SaveCopy(CONTEXT.NewContext(res,req)))
+	})
 }
 
 func NOTES_GET_Backups(res http.ResponseWriter, req *http.Request, params httprouter.Params){
@@ -172,6 +175,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 			noteid , _ := strconv.ParseInt(req.FormValue("notekey"),10,64)	
 			b := BACKUP.Backup(content)
 			BACKUP.UpdateBackup(ctx,noteid,int64(ctx.User.IntID),&b)
+			NOTES.Notify(ctx, noteid)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 				ctx.Redirect("/view/" + req.FormValue("notekey"))
 			}

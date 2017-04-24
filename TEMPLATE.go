@@ -9,12 +9,15 @@ import (
 	"math/rand"
 	"mime/multipart"
 	"strings"
+	"github.com/Esseh/notorious-dev/PM"
 	"github.com/Esseh/notorious-dev/AUTH"
 	"github.com/Esseh/notorious-dev/CLOUD"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/NOTES"
+	"github.com/Esseh/notorious-dev/FORUM"
+	"github.com/Esseh/notorious-dev/NOTIFICATION"
 	"github.com/Esseh/notorious-dev/USERS"
 	"github.com/Esseh/retrievable"
 	"github.com/disintegration/imaging"
@@ -46,8 +49,19 @@ func init() {
 		"canEdit":       NOTES.CanEditNote,
 		"canView":       NOTES.CanViewNote,
 		"getEmail":		 GetEmail,
+		"retrieveMessages": PM.RetrieveMessages,
+		"getPageNumbers": PM.GetPageNumbers,
+		"incPage": IncPage,
+		"decPage": DecPage,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
+		"getSubscriptions": NOTES.GetSubscriptions,
+		"getNotifications": NOTIFICATION.GetNotifications,
+		"isAdmin" : FORUM.IsAdmin,
+		"getCategories" : FORUM.GetCategories,
+		"getForums"  : FORUM.GetForums,
+		"getThreads" : FORUM.GetThreads,
+		"getPosts" : FORUM.GetPosts,
 	} // Load up all templates.
 	CORE.TPL = template.New("").Funcs(funcMap)
 	CORE.TPL = template.Must(CORE.TPL.ParseGlob("templates/*"))
@@ -60,6 +74,11 @@ type CropBounds struct {
 	H         int
 	RotateDeg int
 }
+func DecPage(i int64) int64 {
+	if i == 0 { return 0 }
+	return i - 1 
+}
+func IncPage(i int64) int64 { return i + 1 }
 
 func GetMod(a int64) int64 {
 	rand.Seed(a)
