@@ -188,7 +188,8 @@ var clickRemoveNote = function (event) {
 };
 
 var clickCopyNote = function (event) {
-
+  let noteId = event.target.getAttribute('value');
+  copyNote(noteId);
 }
 
 ////////////////////  FUNCTIONS WITH API CALLS ////////////////////
@@ -409,6 +410,30 @@ var removeNote = function (parentId, folderNoteId) {
       displayError("Post request failed.");
     });
 };
+
+var copyNote = function (noteId) {
+    let noteIdInt = parseInt(noteId, 10);
+    console.log(noteIdInt);
+    $.post('/note/api/copynote', { NoteID: noteIdInt }, function (data) {
+      let dataObj = $.parseJSON(data);
+      console.log(dataObj);
+      if(dataObj.success == true) {
+        console.log("note-copied");
+      }
+      else {
+        if (dataObj.code == 0) {
+          displayError("An error has occured.");
+        }
+        if (dataObj.code == 1) {
+          displayError("A database error has occured.");
+        }
+      }
+    }).fail(function () {
+      displayError("Post request failed.");
+    });
+};
+
+
 
 // This funcion makes an api call to initialize the root folder. It is called when the javascript is loaded.
 var initializeRoot = function (rootId) {
