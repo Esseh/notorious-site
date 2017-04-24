@@ -8,6 +8,17 @@
       <a href="/">{{ template "menu-logo" .}}</a>
     </li>
       {{if .User.Email}}
+
+    {{$userID := toInt .User.IntID}}
+    {{ $notifications := getNotifications .Ctx $userID }}
+    {{ if $notifications.NotificationsPending }}
+     <div> TEST - NOTI </div>
+    {{ else }}
+     <div> TEST - NO NOTI </div>
+    {{ end }}
+    {{ range $i, $v := $notifications.Notifications }}
+    {{ end }}
+
       <li id="second">
         <dropdown>
           <input id="toggle2" type="checkbox">
