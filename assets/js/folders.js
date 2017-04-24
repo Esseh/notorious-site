@@ -439,12 +439,19 @@ var copyNote = function (noteId) {
 var initializeRoot = function (rootId) {
   $.post('/folder/api/initializeroot', { RootID: rootId }, function (data) {
     let dataObj = $.parseJSON(data);
+
     if(!((dataObj.code == -1) || (dataObj.code == 6))) {
       if (dataObj.code == 0) {
         displayError("An error has occured when initializing the root folder.");
       }
       if (dataObj.code == 5) {
         displayError("The ID of the root folder does not match the ID of the user.");
+      }
+    }
+    else {
+      var rootArray = document.getElementsByClassName('root');
+      for (let root of rootArray) {
+        openFolder(root.id);
       }
     }
   }).fail(function () {
@@ -537,7 +544,6 @@ var rootArray = document.getElementsByClassName('root');
 for (let root of rootArray) {
   initializeRoot(root.id);
   $(root).click(clickFolder);
-  openFolder(root.id);
   $(document.getElementById(root.id)).unbind();
   $(document.getElementById(root.id)).click(clickOpenFolder);
 }
