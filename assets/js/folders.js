@@ -248,7 +248,7 @@ var openFolder = function (folderID) {
         $(document.getElementById("" + folderID + '-content')).append(
             '<div id="' + noteId + '-container" class="note-container">' +
               '<div id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> X </div>' +
-              '<div id="' + noteId + '-copy-note" class="copy-note" value="' + folderID + '"> Copy </div>' +
+              '<div id="' + noteId + '-copy-note" class="copy-note" value="' + note.id + '"> Copy </div>' +
               '<div id="' + noteId + '" class="note" value="' + note.id + '""> ' + note.title + '</div>' +
             '</div>');
         $(document.getElementById(noteId + "-remove-note")).unbind();
