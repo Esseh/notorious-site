@@ -9,13 +9,14 @@ import (
 	"math/rand"
 	"mime/multipart"
 	"strings"
-	"github.com/Esseh/notorious-dev/PM"
+
 	"github.com/Esseh/notorious-dev/AUTH"
 	"github.com/Esseh/notorious-dev/CLOUD"
 	"github.com/Esseh/notorious-dev/CONTEXT"
 	"github.com/Esseh/notorious-dev/COOKIE"
 	"github.com/Esseh/notorious-dev/CORE"
 	"github.com/Esseh/notorious-dev/NOTES"
+	"github.com/Esseh/notorious-dev/PM"
 	"github.com/Esseh/notorious-dev/USERS"
 	"github.com/Esseh/retrievable"
 	"github.com/disintegration/imaging"
@@ -27,30 +28,30 @@ import (
 func init() {
 	// Tie functions into template here with ... "functionName":theFunction,
 	funcMap := template.FuncMap{
-		"getAvatarURL":  CORE.GetAvatarURL,
-		"getUser":       GetUserFromID,
-		"humanize":      humanize.Time,
-		"humanizeSize":  humanize.Bytes,
-		"monthfromtime": CORE.MonthFromTime,
-		"yearfromtime":  CORE.YearFromTime,
-		"dayfromtime":   CORE.DayFromTime,
-		"findsvg":       CORE.FindSVG,
-		"findtemplate":  CORE.FindTemplate,
-		"inc":           CORE.Inc,
-		"addCtx":        CORE.AddCtx,
-		"getDate":       CORE.GetDate,
-		"toInt":         CORE.ToInt,
-		"getMod":        GetMod,
-		"canEditNote":	 NOTES.CanEditNote,
-		"canViewNote":	 NOTES.CanViewNote,
-		"findCollabs":   FindCollaborators,
-		"canEdit":       NOTES.CanEditNote,
-		"canView":       NOTES.CanViewNote,
-		"getEmail":		 GetEmail,
+		"getAvatarURL":     CORE.GetAvatarURL,
+		"getUser":          GetUserFromID,
+		"humanize":         humanize.Time,
+		"humanizeSize":     humanize.Bytes,
+		"monthfromtime":    CORE.MonthFromTime,
+		"yearfromtime":     CORE.YearFromTime,
+		"dayfromtime":      CORE.DayFromTime,
+		"findsvg":          CORE.FindSVG,
+		"findtemplate":     CORE.FindTemplate,
+		"inc":              CORE.Inc,
+		"addCtx":           CORE.AddCtx,
+		"getDate":          CORE.GetDate,
+		"toInt":            CORE.ToInt,
+		"getMod":           GetMod,
+		"canEditNote":      NOTES.CanEditNote,
+		"canViewNote":      NOTES.CanViewNote,
+		"findCollabs":      FindCollaborators,
+		"canEdit":          NOTES.CanEditNote,
+		"canView":          NOTES.CanViewNote,
+		"getEmail":         GetEmail,
 		"retrieveMessages": PM.RetrieveMessages,
-		"getPageNumbers": PM.GetPageNumbers,
-		"incPage": IncPage,
-		"decPage": DecPage,
+		"getPageNumbers":   PM.GetPageNumbers,
+		"incPage":          IncPage,
+		"decPage":          DecPage,
 		// "isOwner":       isOwner,
 		"parse": CORE.EscapeString,
 	} // Load up all templates.
@@ -65,9 +66,12 @@ type CropBounds struct {
 	H         int
 	RotateDeg int
 }
+
 func DecPage(i int64) int64 {
-	if i == 0 { return 0 }
-	return i - 1 
+	if i == 0 {
+		return 0
+	}
+	return i - 1
 }
 func IncPage(i int64) int64 { return i + 1 }
 
@@ -78,17 +82,17 @@ func GetMod(a int64) int64 {
 
 func GetEmail(ctx appcontext.Context, userID int64) string {
 	u := USERS.User{}
-	retrievable.GetEntity(ctx,userID,&u)
+	retrievable.GetEntity(ctx, userID, &u)
 	return u.Email
 }
 
-func FindCollaborators(ctx CONTEXT.Context,c string) []int64 {
+func FindCollaborators(ctx CONTEXT.Context, c string) []int64 {
 	dupCheck := make(map[int64]bool)
 	temp := strings.Split(c, ":")
 	var collabs []int64
 	for _, x := range temp {
 		nextEntry := AUTH.EmailReference{}
-		err := retrievable.GetEntity(ctx,x,&nextEntry)
+		err := retrievable.GetEntity(ctx, x, &nextEntry)
 		if (err == nil) && (!dupCheck[nextEntry.UserID]) {
 			collabs = append(collabs, nextEntry.UserID)
 			dupCheck[nextEntry.UserID] = true
