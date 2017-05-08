@@ -6,22 +6,29 @@
  */
 
  #edit a {
-     width: 300px;
-     color: #636363;
-     font-weight: bold;
-     border-radius: 8px;
-     padding: 1rem;
-     margin: 1rem;
-     background-color: white;
-     border:solid 0;
- }
+    color: #8e8e8e;
+    border: none;
+    width: 100px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+}
 
-#edit{
-  display:flex;
-  justify-content: center;
-  text-align: center;
-  margin: 10px;
-  color: white;
+#left{
+  text-align: right;
+}
+
+#right{
+  text-align: left;
+}
+
+#edit {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 30px;
+    width: 500px;
+    color: white;
 }
 
 h1, h2, h3, h4, h5, h6{
@@ -53,7 +60,7 @@ h1, h2, h3, h4, h5, h6{
     cursor: text;
     line-height: 1.42;
     height: auto;
-    min-height: 100vh;
+    min-height: 1200px;
     border-radius: 0;
     outline: none;
     tab-size: 4;

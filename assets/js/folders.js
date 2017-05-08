@@ -31,7 +31,7 @@ var refreshContent = function (folderId) {
 
 // This is the function called when a note is clicked. It will open the note in a new window.
 var openNote = function (event) {
-  window.open('/view/' + event.target.getAttribute("value"), "_blank");
+  //window.open('/view/' + event.target.getAttribute("value"), "_blank");
 };
 
 // This is the function called when a closed folder is clicked.
@@ -249,7 +249,7 @@ var openFolder = function (folderID) {
             '<div id="' + noteId + '-container" class="note-container">' +
               '<div id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> X </div>' +
               '<div id="' + noteId + '-copy-note" class="copy-note" value="' + note.id + '"> Copy </div>' +
-              '<div id="' + noteId + '" class="note" value="' + note.id + '""> ' + note.title + '</div>' +
+              '<a id="' + noteId + '" class="note" href="/view/' + note.id + '""> ' + note.title + '</a>' +
             '</div>');
         $(document.getElementById(noteId + "-remove-note")).unbind();
         $(document.getElementById(noteId + "-remove-note")).click(clickRemoveNote);

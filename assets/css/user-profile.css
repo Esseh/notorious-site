@@ -4,15 +4,20 @@ section#profile-picture-section {
     flex-direction: column;
     width: 300px;
     height: 80vh;
-    background-color: white;
+    background-color: #f7f7f7;
     padding: 3em 1em;
-    border-top: solid 50px #8171ad;
+    border-top: solid 50px white;
+}
+
+body{
+  background: white;
 }
 
 #profile #header {
     padding: 4em 0 0 0;
     display: flex;
     height: 90vh;
+    min-width: 1000px;
 }
 
 #note-box div {
@@ -20,18 +25,6 @@ section#profile-picture-section {
     align-items: center;
 }
 
-#note-box svg#pencil {
-    width: 90px;
-    height: 90px;
-}
-
-#header svg#pencil {
-    position: absolute;
-    top: 270;
-    height: 150px;
-    width: 150px;
-    left: 17%;
-}
 
 #profile #user-picture {
     display: flex;
@@ -50,7 +43,7 @@ section#profile-picture-section {
 
 #profile #user-name {
     padding: 2rem 2rem .5rem 2rem;
-    color: #808080;
+    color: #8e8e8e;
     font-size: 2rem;
     font-weight: bold;
     font-family: sans-serif;
@@ -71,17 +64,39 @@ section#profile-picture-section {
     flex-direction: column;
     align-items: flex-start;
     padding: 2rem;
-    color: grey;
-    border-radius: 10px;
-    background-color: white;
-    margin: 3em 3em auto 3em;
+    color: #8e8e8e;
+    background-color: #f7f7f7;
+    margin-bottom: 1em;
+}
+
+.section-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 2rem 2rem 2rem;
+    color: #8e8e8e;
+    background-color: #f7f7f7;
+}
+
+#bio-subscribe{
+  margin: 3em 3em auto 3em;
+  width: 100%;
+}
+
+.profile-section {
+    font-weight: 100;
+    font-size: 1rem;
+    margin: 0;
 }
 
 #profile #bio-tag {
-    font-size: 1.5rem;
-    color: #656565;
-    font-family: sans-serif;
-    margin: .3rem;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  font-weight: 100;
+  color: #8e8e8e;
+  font-family: sans-serif;
+  margin: .3rem;
 }
 
 #profile #bio {
@@ -115,7 +130,7 @@ img.user-avatar {
 
 #profile #user-edit {
     margin: 1rem 0 0 0;
-    color: #adadad;
+    color: #8e8e8e;
     padding: 2px 20px;
     border-radius: 8px;
 }
@@ -190,4 +205,119 @@ img.user-avatar {
 .note-select:hover {
     background-color: rgb(183, 174, 208) !important;
     color: white !important;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    color: #8e8e8e !important;
+    background-color: #f7f7f7;
+    letter-spacing: 1px;
+    border-radius: 0px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    z-index: 2 !important;
+    box-shadow: 0 1px 5px #e4e4e4;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+    background: #8171ad;
+    color: #fff !important;
+    cursor: pointer;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display:none;
+    background-color: #f9f9f9;
+    min-width: 500px;
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: #8e8e8e;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    border: solid 1px #ecebeb;
+    width: 100%;
+    -moz-transition: color .2s ease, border-bottom .2s ease, background-color .2s ease;
+-webkit-transition: color .2s ease, border-bottom .2s ease, background-color .2s ease;
+-ms-transition: color .2s ease, border-bottom .2s ease, background-color .2s ease;
+transition: color .2s ease, border-bottom .2s ease, background-color .2s ease;
+
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #8d7bb1 !important;
+    color: white !important;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {
+    display: block;
+}
+
+div#dropdown {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+label#subscriptions {
+    width: 100%;
+    margin: 0;
+}
+
+span.note-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+a.collabLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    border-bottom: none;
+    border-top: none;
+    border-right: none;
+}
+
+.section-note div {
+    border-right: solid 1px #ecebeb;
+}
+
+a.note-name {
+    width: 200px;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+span.icon.fa-file-o {
+    font-size: 25px;
+}
+
+label.section-note {
+  border: solid 1px #ecebeb;
+display: flex;
+width: 100%;
+margin: 0;
+border-top: none;
 }

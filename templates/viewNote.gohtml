@@ -16,17 +16,28 @@
 </head>
 {{ template "header" .HeaderData}}
 <body>
-
-<div id="edit">
+<div id="profile">
+  {{ if .Owner.Avatar }}
+  <label id="user-picture">{{ template "user-avatar" .Owner}}</label>
+  {{ else }}
+  <label id="user-picture" class="fa fa-user"></label>
+  {{ end }}
+  <div id="doctitle">
+  {{.Title}}
+  </div>
+  {{$mod := (getMod (toInt .User.IntID))}}
+  <span class="logo">{{template "pencil" $mod}}</span>
+<span>Created by: <a href = "/profile/{{.Owner.IntID}}">{{.Owner.First}} {{.Owner.Last}} </a></span>
 {{if (canEdit .NoteData .User)}}
-  <a href="/edit/{{.Notekey}}">Edit</a><br>
-{{end}}
-<a href = "/profile/{{.Owner.IntID}}"> Note Owned by: {{.Owner.First}} {{.Owner.Last}} </a>
+<div id="edit">
+  <a id="left" href="/edit/{{.Notekey}}">Edit Note</a>
+  <span></span>
+  <a id="right" href="/backup/{{.Notekey}}?TargetEmail={{.User.Email}}">View History</a>
  </div>
-<div class="box">
-<div id="doctitle">
-{{.Title}}
+ {{end}}
 </div>
+
+<div class="box">
 
 
 {{.Content}}
@@ -76,104 +87,45 @@
 <!-- Include the Quill library -->
 <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
 
-<!-- Initialize Quill editor -->
+
+
+<!-- subscribe button -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script>
+var isSubscribed = {{.Subscribed}};
 
-document.getElementById("clickMe").onclick = function () { post('/document',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML}); };
-
-
-
-var toolbarOptions = [
-  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-  ['blockquote', 'code-block', 'video', 'image'],
-
-  [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-  [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-  [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-  [{ 'direction': 'rtl' }],                         // text direction
-
-  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-  [{ 'font': [] }],
-  [{ 'align': [] }],
-
-  ['clean']                                         // remove formatting button
-];
-
-
-  var editor = new Quill('#editor', {
-    modules: { toolbar: toolbarOptions },
-    theme: 'snow'
-  });
-
-//submission form
-// alert("test")
-// document.getElementById("submit").onclick = post('/document',{note: editor.container.firstChild.innerHTML});
-//
-// var el = document.getElementById("submit");
-// if (el.addEventListener)
-//     el.addEventListener("click", post('/document',{note: editor.container.firstChild.innerHTML}), false);
-// else if (el.attachEvent)
-//     el.attachEvent('onclick', post('/document',{note: editor.container.firstChild.innerHTML}));
-
-
-// 	// Store accumulated changes
-// var change = new Delta();
-// quill.on('text-change', function(delta) {
-//   change = change.compose(delta);
-// });
-//
-// // Save periodically
-// setInterval(function() {
-//   if (change.length() > 0) {
-//     console.log('Saving changes', change);
-//     /*
-//     Send partial changes
-//     $.post('/your-endpoint', {
-//       partial: JSON.stringify(change)
-//     });
-//
-//     Send entire document
-//     $.post('/your-endpoint', {
-//       doc: JSON.stringify(quill.getContents())
-//     });
-//     */
-//     change = new Delta();
-//   }
-// }, 5*1000);
-//
-// // Check for unsaved data
-// window.onbeforeunload = function() {
-//   if (change.length() > 0) {
-//     return 'There are unsaved changes. Are you sure you want to leave?';
-//   }
-
-function post(path, params, method) {
-    method = "post";
-
-    var form = document.createElement("form");
-    form.setAttribute("method", method);
-    form.setAttribute("action", path);
-
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-         }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
+var changeSubscription = function(){
+if(isSubscribed){
+  $(".logo svg#pencil").css("animation", "spin 1s ease-in-out infinite")
+  $(".logo svg#pencil").css("animation-direction", "alternate")
+} else {
+  $(".logo svg#pencil").css("animation", "none")
+}
 }
 
+changeSubscription()
 
+$(".logo svg#pencil").click(function(){
+  if(!isSubscribed){
+  $.post('/note/api/subscribe', { NoteID : {{.Notekey}} }, function (data) {
+    let dataObj = $.parseJSON(data)
+    if(dataObj.success == true) {
+        isSubscribed = !isSubscribed
+        changeSubscription()
+
+    }
+  })
+}else{
+  $.post('/note/api/unsubscribe', { NoteID : {{.Notekey}} }, function (data) {
+    let dataObj = $.parseJSON(data)
+    if(dataObj.success == true) {
+        isSubscribed = !isSubscribed
+        changeSubscription()
+    }
+  })
+}
+
+})
 </script>
 
 {{end}}

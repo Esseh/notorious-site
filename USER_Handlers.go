@@ -29,19 +29,19 @@ func USERS_GET_ProfileView(res http.ResponseWriter, req *http.Request, params ht
 		ci, getErr := GetUserFromID(ctx, id)
 		if !ctx.ErrorPage("Not a valid user ID", getErr, http.StatusNotFound) {
 			notes, err := NOTES.GetAllNotes(ctx, id)
+			subscriptions := NOTES.GetSubscriptions(ctx, id)
 			if !ctx.ErrorPage("Internal Server Error", err, http.StatusSeeOther) {
-				avatarMod := GetMod(id)
 				screen := struct {
 					CONTEXT.HeaderData
-					Data      *USERS.User
-					AllNotes  []NOTES.NoteOutput
-					AvatarMod int64
-					Root	  int64
+					Data     *USERS.User
+					AllNotes []NOTES.NoteOutput
+					SubNotes []NOTES.NoteOutput
+					Root     int64
 				}{
 					*MakeHeader(ctx),
 					ci,
 					notes,
-					avatarMod,
+					subscriptions,
 					id,
 				}
 				CORE.ServeTemplateWithParams(res, "user-profile", screen)
