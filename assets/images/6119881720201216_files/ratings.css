@@ -1,0 +1,23 @@
+.star {
+    background-image: url(/assets/images/EmptyStar.png);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    background-size:64px 64px;
+    background-repeat: no-repeat;
+}
+
+.star:hover {
+    background-image: url(/assets/images/FullStar.png);
+}
+
+#star-one:hover {
+    background-image: url(/assets/images/FullStar.png);
+}
+
+#star-two:hover + #star-one {
+    background-image: url(/assets/images/FullStar.png);
+}
