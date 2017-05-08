@@ -212,12 +212,18 @@
 
 .copy-note {
   float: right;
-  background-color: green;
+  background-image: url(/assets/images/CopyIcon.png);
+  background-size: 25px 25px;
+  background-repeat: no-repeat;
   border: solid 1px white;
   color: white;
-  width: 3em;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   text-align: center;
   cursor: pointer;
+  background-color: white;
 }
 
 .open-folder {

@@ -1,19 +1,28 @@
 .dropbtn {
     background-color: #4CAF50;
     color: white;
-    padding: 16px;
     font-size: 16px;
     border: none;
     cursor: pointer
-    min-width: 160px;
+    min-width: 150px;
     height: 50px;
-    line-height: 50px;
     text-align: center;
+    border-radius: 0;
+    padding: 1rem;
 }
 
 .clearbtn {
     background-color: gray;
     color: white;
+    min-width: 150px;
+    border-radius: 0;
+}
+
+.clearbtn:hover {
+    background-color: gray;
+    color: white;
+    min-width:150px;
+    border-radius: 0;
 }
 
 .dropbtn:hover, .dropbtn:focus {
@@ -29,7 +38,7 @@
     display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 160px;
+    min-width: 150px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
 }
