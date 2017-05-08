@@ -167,9 +167,7 @@
 }
 
 .note-container:hover {
-  background-color: #935d8c !important;
-  color: white !important;
-  border-color: white;
+  cursor: pointer;
 }
 
 .remove-folder {
