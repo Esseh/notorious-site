@@ -11,6 +11,8 @@
 <link href="/assets/css/documentviewsnow.css" rel="stylesheet">
 <link href="/assets/css/documentviewbubble.css" rel="stylesheet">
 
+<link href="/assets/css/ratings.css" rel="stylesheet">
+
 <script src="//cdn.quilljs.com/1.1.5/quill.core.js"></script>
 <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
 </head>
@@ -23,6 +25,19 @@
 {{end}}
 <a href = "/profile/{{.Owner.IntID}}"> Note Owned by: {{.Owner.First}} {{.Owner.Last}} </a>
  </div>
+
+<div id="ratings">
+
+  <div id="current-rating" noteid="{{.Notekey}}"> </div>
+
+  <div id="star-1" class="star" onclick="clickStar(5,{{.Notekey}})"> </div>
+  <div id="star-2" class="star" onclick="clickStar(4,{{.Notekey}})"> </div>
+  <div id="star-3" class="star" onclick="clickStar(3,{{.Notekey}})"> </div>
+  <div id="star-4" class="star" onclick="clickStar(2,{{.Notekey}})"> </div>
+  <div id="star-5" class="star" onclick="clickStar(1,{{.Notekey}})"> </div>
+</div>
+
+
 <div class="box">
 <div id="doctitle">
 {{.Title}}
@@ -72,7 +87,7 @@
 		</script>
 </form> -->
 
-
+<script src="../assets/js/ratings.js"></script>
 <!-- Include the Quill library -->
 <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
 

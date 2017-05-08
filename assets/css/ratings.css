@@ -1,0 +1,103 @@
+#ratings {
+  width: 500px;
+  margin: auto;
+  margin-bottom: 20px;
+  height: 70px;
+}
+
+.star {
+    background-image: url(/assets/images/EmptyStar.png);
+    float: right;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    background-size:64px 64px;
+    background-repeat: no-repeat;
+}
+
+#current-rating {
+    text-align:center;
+    width: 170px;
+    height:64px;
+    display: inline-block;
+    background-color: white;
+    color: #636363;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 1rem;
+}
+/*
+.star:hover {
+    background-image: url(/assets/images/FullStar.png);
+}*/
+
+/*#star-one:hover {
+    background-image: url(/assets/images/FullStar.png);
+}*/
+
+#star-1:hover {
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-1:hover ~ #star-2{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-1:hover ~ #star-3{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-1:hover ~ #star-4{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-1:hover ~ #star-5{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+
+#star-2:hover {
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-2:hover ~ #star-3{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-2:hover ~ #star-4{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-2:hover ~ #star-5{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+
+#star-3:hover {
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-3:hover ~ #star-4{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-3:hover ~ #star-5{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-4:hover {
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-4:hover ~ #star-5{
+  background-image: url(/assets/images/FullStar.png);
+}
+
+#star-5:hover {
+  background-image: url(/assets/images/FullStar.png);
+}
+
+

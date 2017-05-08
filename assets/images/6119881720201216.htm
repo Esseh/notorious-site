@@ -1,0 +1,248 @@
+
+<!-- saved from url=(0043)http://localhost:8080/view/6119881720201216 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="./6119881720201216_files/quill.min.js"></script>
+<link rel="stylesheet" href="./6119881720201216_files/main.css">
+
+
+
+
+<link href="./6119881720201216_files/documentviewcore.css" rel="stylesheet">
+<link href="./6119881720201216_files/documentviewsnow.css" rel="stylesheet">
+<link href="./6119881720201216_files/documentviewbubble.css" rel="stylesheet">
+
+<link href="./6119881720201216_files/ratings.css" rel="stylesheet">
+
+<script src="./6119881720201216_files/quill.core.js"></script>
+<script src="./6119881720201216_files/quill.js"></script>
+<link rel="stylesheet" href="./6119881720201216_files/notifications.css"></head>
+
+
+
+
+<body><nav id="nav">
+  <ul>
+    <li id="first" style="width: 200px">
+      <a href="http://localhost:8080/new/"><span class="icon fa-copy"></span><span class="desktop">Create Notes</span></a>
+    </li>
+    <li id="home-link" style="width: 40px">
+      <a href="http://localhost:8080/">
+<svg version="1.1" id="pencil" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="85px" height="85px" viewBox="0 0 85 85" enable-background="new 0 0 85 85" xml:space="preserve">
+<path class="white" fill="#FFFFFF" d="M55.41,20.7H29.59c0,0-1.44-8.82,0-10.71c4.57-6.01,21.25-6.01,25.82,0C56.84,11.88,55.41,20.7,55.41,20.7z"></path>
+<polygon fill="#E5B55E" points="42.5,59.7 36.54,58.21 33.9,57.54 36.05,56.46 "></polygon>
+<polygon fill="#E5B55E" points="51.11,57.55 51.08,57.56 48.46,58.22 42.52,59.71 48.93,56.47 48.95,56.46 "></polygon>
+<polygon class="purple" points="55.36,25.1 55.36,56.46 55.4,56.47 55.36,56.48 55.36,59.68 51.12,57.55 51.11,57.55 48.95,56.46
+	48.93,56.47 42.52,59.71 42.51,59.71 42.5,59.7 36.05,56.46 33.9,57.54 29.62,59.7 29.6,59.7 29.6,25.1 29.59,25.1 29.59,20.7
+	55.41,20.7 55.41,25.1 "></polygon>
+<polygon fill="#EABB78" points="29.62,59.7 29.6,59.71 29.6,59.7 "></polygon>
+<polygon fill="#D6A456" points="55.36,59.68 55.36,59.71 51.08,57.56 48.95,56.48 48.93,56.47 48.95,56.46 51.11,57.55 51.12,57.55
+	"></polygon>
+<polygon class="white" fill="#FFFFFF" points="55.41,59.71 45.21,75.36 43.91,75.36 42.52,77.25 41.13,75.36 39.79,75.36 29.59,59.71 29.6,59.71
+	29.6,59.7 29.62,59.7 33.9,57.54 36.05,56.46 42.5,59.7 42.51,59.71 42.52,59.71 48.93,56.47 48.95,56.46 51.11,57.55 51.12,57.55
+	55.36,59.68 "></polygon>
+<polygon class="purple" points="45.21,75.359 42.5,79.51 39.79,75.359 "></polygon>
+</svg>
+</a>
+    </li>
+      
+      
+      
+
+      <div class="dropdown">
+          
+        <button class="dropbtn" style="background-color: gray"> No New Notifications </button>
+          
+        
+
+        <div id="dropeddown" class="dropdown-content">
+          
+            <a> tester@test.com sent you a private message </a>
+          
+            <a> tester@test.com sent you a private message </a>
+          
+            <a>  sent you a private message </a>
+          
+            <a> tester@test.com sent you a private message </a>
+          
+          <button onclick="clearNotif()" class="clearbtn"> Clear Notifications</button>
+        </div>
+      </div>
+
+      <li id="second">
+        <dropdown>
+          <input id="toggle2" type="checkbox">
+          <label for="toggle2" class="animate">
+          <span>Hello, test!</span>
+          
+          <i id="profile-picture" class="fa fa-user"></i>
+          
+          </label>
+          <ul class="animate">
+            <a href="http://localhost:8080/profile/5838406743490560" class="animate"><i class="fa fa-user"></i>View Profile</a>
+            <a href="http://localhost:8080/logout?redirect=view%2f6119881720201216" class="animate"><i class="fa fa-mail-reply"></i>Logout</a>
+          </ul>
+        </dropdown>
+      </li>
+      
+  </ul>
+</nav>
+
+<script src="./6119881720201216_files/jquery.min.js"></script>
+<script src="./6119881720201216_files/jquery.scrollex.min.js"></script>
+<script src="./6119881720201216_files/jquery.scrolly.min.js"></script>
+<script src="./6119881720201216_files/skel.min.js"></script>
+<script src="./6119881720201216_files/util.js"></script>
+<script src="./6119881720201216_files/notifications.js"></script>
+
+
+
+
+<div id="edit">
+
+  <a href="http://localhost:8080/edit/6119881720201216">Edit</a><br>
+
+<a href="http://localhost:8080/profile/5838406743490560"> Note Owned by: test test </a>
+ </div>
+
+<div id="ratings">
+
+  <div id="current-rating" noteid="6119881720201216">Rating: 4</div>
+
+  <div id="star-one" class="star" onclick="clickStar(1,&quot;6119881720201216&quot;)"> </div>
+  <div id="star-two" class="star" onclick="clickStar(2,&quot;6119881720201216&quot;)"> </div>
+  <div id="star-two" class="star" onclick="clickStar(3,&quot;6119881720201216&quot;)"> </div>
+  <div id="star-two" class="star" onclick="clickStar(4,&quot;6119881720201216&quot;)"> </div>
+  <div id="star-two" class="star" onclick="clickStar(5,&quot;6119881720201216&quot;)"> </div>
+</div>
+
+
+<div class="box">
+<div id="doctitle">
+Title
+</div>
+
+
+<h1>Example Header</h1><p><br></p><h3>Smaller Header</h3><p><br></p><ul><li>bullet item</li><li>bullet item</li></ul><p><br></p><ol><li>number</li><li class="ql-indent-1">letter</li><li>number</li><li class="ql-indent-1">letter</li><li class="ql-indent-1">letter</li></ol><p><br></p>
+</div>
+
+
+
+<link href="./6119881720201216_files/quill.bubble.css" rel="stylesheet">
+<link href="./6119881720201216_files/quill.core.css" rel="stylesheet">
+<link href="./6119881720201216_files/quill.snow.css" rel="stylesheet">
+
+
+<form>
+
+
+
+
+
+
+
+
+
+<script src="./6119881720201216_files/ratings.js"></script>
+
+<script src="./6119881720201216_files/quill.js"></script>
+
+
+<script>
+
+document.getElementById("clickMe").onclick = function () { post('/document',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML}); };
+
+
+
+var toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike'],        
+  ['blockquote', 'code-block', 'video', 'image'],
+
+  [{ 'header': 1 }, { 'header': 2 }],               
+  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+  [{ 'script': 'sub'}, { 'script': 'super' }],      
+  [{ 'indent': '-1'}, { 'indent': '+1' }],          
+  [{ 'direction': 'rtl' }],                         
+
+  [{ 'size': ['small', false, 'large', 'huge'] }],  
+  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+  [{ 'color': [] }, { 'background': [] }],          
+  [{ 'font': [] }],
+  [{ 'align': [] }],
+
+  ['clean']                                         
+];
+
+
+  var editor = new Quill('#editor', {
+    modules: { toolbar: toolbarOptions },
+    theme: 'snow'
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function post(path, params, method) {
+    method = "post";
+
+    var form = document.createElement("form");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+
+</script>
+
+</form></body></html>
