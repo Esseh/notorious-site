@@ -11,6 +11,11 @@
     text-align: center;
 }
 
+.clearbtn {
+    background-color: gray;
+    color: white;
+}
+
 .dropbtn:hover, .dropbtn:focus {
     background-color: #3e8e41;
 }

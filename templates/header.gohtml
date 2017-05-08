@@ -1,6 +1,6 @@
 {{define "header"}}
 
-<link rel="stylesheet" href="/assets/css/notifications.css"/>x
+<link rel="stylesheet" href="/assets/css/notifications.css"/>
 
 <nav id="nav">
   <ul>
@@ -15,11 +15,10 @@
       {{ $notifications := getNotifications .Ctx $userID }}
 
       <div class="dropdown">
-        <button onclick="openDrop()" class="dropbtn">
           {{ if $notifications.NotificationsPending }}
-             New Notifications!
+        <button onclick="openDrop()" id="newbutton" class="dropbtn"> New Notifications! </button>
           {{ else }}
-             No New Notifications
+        <button class="dropbtn" style="background-color: gray"> No New Notifications </button>
           {{ end }}
         </button>
 
@@ -27,6 +26,7 @@
           {{ range $i, $v := $notifications.Notifications }}
             <a> {{ $v }} </a>
           {{ end }}
+          <button onclick="clearNotif()" class="clearbtn"> Clear Notifications</button>
         </div>
       </div>
 
