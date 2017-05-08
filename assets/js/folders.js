@@ -31,7 +31,7 @@ var refreshContent = function (folderId) {
 
 // This is the function called when a note is clicked. It will open the note in a new window.
 var openNote = function (event) {
-  window.open('/view/' + event.target.getAttribute("value"), "_blank");
+  //window.open('/view/' + event.target.getAttribute("value"), "_blank");
 };
 
 // This is the function called when a closed folder is clicked.

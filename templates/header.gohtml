@@ -14,15 +14,15 @@
       {{$userID := toInt .User.IntID}}
       {{ $notifications := getNotifications .Ctx $userID }}
 
-      <div class="dropdown">
+      <div class="dropdowntop">
           {{ if $notifications.NotificationsPending }}
-        <button onclick="openDrop()" id="newbutton" class="dropbtn"> New Notifications! </button>
+        <button onclick="openDrop()" id="newbutton" class="dropbutton"> New Notifications! </button>
           {{ else }}
-        <button class="dropbtn" style="background-color: gray"> No New Notifications </button>
+        <button class="dropbutton" style="background-color: gray"> No New Notifications </button>
           {{ end }}
         </button>
 
-        <div id="dropeddown" class="dropdown-content">
+        <div id="dropeddown" class="dropdown-contenttop">
           {{ range $i, $v := $notifications.Notifications }}
             <a> {{ $v }} </a>
           {{ end }}
