@@ -20,7 +20,7 @@ function getRating(noteID) {
     if(dataObj.success == true) {
       console.log(dataObj);
       document.getElementById("current-rating").innerHTML = "Avg. Rating: " +
-      dataObj.totalRating;
+      dataObj.totalRating + " / 5";
     }
     else {
       console.log(dataObj.code);

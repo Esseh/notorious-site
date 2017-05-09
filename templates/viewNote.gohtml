@@ -39,6 +39,9 @@
 
 <div id="ratings">
 
+  <div id="savecopy" onclick="copyNote({{.Notekey}})" style="background-image:url(/assets/images/CopyIcon.png); height:32px; width: 32px; min-height:32px; min-width:32px; background-size: 32px 32px; display:inline-block;">
+  </div>
+
   <div id="current-rating" noteid="{{.Notekey}}"> </div>
 
   <div id="star-1" class="star" onclick="clickStar(5,{{.Notekey}})"> </div>
@@ -47,7 +50,6 @@
   <div id="star-4" class="star" onclick="clickStar(2,{{.Notekey}})"> </div>
   <div id="star-5" class="star" onclick="clickStar(1,{{.Notekey}})"> </div>
 </div>
-
 
 <div class="box">
 <div id="doctitle">
@@ -144,6 +146,27 @@ $(".logo svg#pencil").click(function(){
 }
 
 })
+
+var copyNote = function (noteId) {
+    $.post('/note/api/copynote', { NoteID: noteId }, function (data) {
+      let dataObj = $.parseJSON(data);
+      console.log(dataObj);
+      if(dataObj.success == true) {
+        console.log("note-copied");
+        document.getElementById("savecopy").style.backgroundImage = "url(/assets/images/CheckmarkIcon.png)";
+      }
+      else {
+        if (dataObj.code == 0) {
+          console.log("An error has occured.");
+        }
+        if (dataObj.code == 1) {
+          console.log("A database error has occured.");
+        }
+      }
+    }).fail(function () {
+      console.log("Post request failed.");
+    });
+};
 </script>
 
 {{end}}
