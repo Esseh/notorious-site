@@ -1,8 +1,8 @@
 #ratings {
-  width: 500px;
+  width: 300px;
   margin: auto;
   margin-bottom: 20px;
-  height: 70px;
+  height: 40px;
 }
 
 .star {
@@ -12,22 +12,21 @@
     border: none;
     cursor: pointer;
     display: inline-block;
-    width: 64px;
-    height: 64px;
-    background-size:64px 64px;
+    width: 32px;
+    height: 32px;
+    background-size:32px 32px;
     background-repeat: no-repeat;
 }
 
 #current-rating {
     text-align:center;
-    width: 170px;
-    height:64px;
+    width: 100px;
+    height:32px;
+    font-size:14px;
     display: inline-block;
-    background-color: white;
-    color: #636363;
+    color: #8e8e8e;
     font-weight: bold;
     border-radius: 8px;
-    padding: 1rem;
 }
 /*
 .star:hover {
