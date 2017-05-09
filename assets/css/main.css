@@ -53,6 +53,7 @@ nav img.user-avatar {
 
 li#first {
     width: 250px;
+    z-index: 2;
 }
 
 li#second {

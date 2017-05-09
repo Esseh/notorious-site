@@ -1,55 +1,89 @@
 .dropbutton {
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    border: none;
-    cursor: pointer
-    min-width: 150px;
-    height: 50px;
-    text-align: center;
-    border-radius: 0;
-    padding: 1rem;
+    background-color: rgb(101, 181, 101);
+    border-radius: 100% !important;
+    height: 60px !important;
+    cursor: pointer;
+    min-width: 60px !important;
+    max-width: 60px;
+    vertical-align: middle;
+    padding: 0;
+    box-shadow: none;
+    transition: box-shadow .5s ease;
 }
 
 .clearbtn {
-    background-color: gray;
+    background-color: #65b565;
     color: white;
+    font-size: 15px;
     min-width: 150px;
-    border-radius: 0;
+    width: 100%;
+    border-radius: 0 0 40px 40px;
 }
 
 .clearbtn:hover {
-    background-color: gray;
-    color: white;
-    min-width:150px;
-    border-radius: 0;
+    background-color: #7bd27b;
+    min-width: 150px;
 }
 
 .dropbutton:hover, .dropbutton:focus {
-    background-color: #3e8e41;
+  box-shadow: 0 0 20px rgb(138, 239, 138);
+  background-color: rgb(101, 181, 101);
 }
 
 .dropdowntop {
-    position: relative;
-    display: inline-block;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    left: 0;
+    height: 60px;
 }
 
 .dropdown-contenttop {
     display: none;
     position: absolute;
+    top: 60px;
+    border-radius: 40px;
     background-color: #f9f9f9;
     min-width: 150px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: 10;
 }
 
 .dropdown-contenttop a {
-    color: black;
-    padding: 12px 16px;
+    color: #8e8e8e;
+    padding: 20px;
     text-decoration: none;
     display: block;
+    border: none;
+    cursor:pointer;
 }
 
 .dropdown-contenttop a:hover {background-color: #f1f1f1}
 
 .show {display:block;}
+
+@-webkit-keyframes spin {
+    0%{
+        transform: rotateZ(-20deg);
+    }
+    100% {
+        transform: rotateZ(20deg);
+    }
+}
+
+#profile-logo svg#pencil {
+  animation: spin .5s ease-in-out infinite ;
+    animation-direction: alternate;
+}
+
+svg#Layer_1 {
+    animation: spin 1s ease-in-out infinite;
+    animation-direction: alternate;
+    position: relative;
+    right: 25px;
+    bottom: 40px;
+    width: 25px;
+    height: 25px;
+}

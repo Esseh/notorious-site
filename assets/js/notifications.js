@@ -7,9 +7,7 @@ function clearNotif() {
   $.post("/NOTIFICATION/api/clear", function( data ) {
   });
     document.getElementById("dropeddown").classList.toggle("show");
-    document.getElementById("newbutton").innerHTML = "No New Notifications";
-    document.getElementById("newbutton").removeAttribute("onclick");
-    document.getElementById("newbutton").style.backgroundColor = "gray";
+    $("div").remove(".dropdowntop");
 }
 
 window.onclick = function(event) {

@@ -250,7 +250,7 @@ var openFolder = function (folderID) {
             '<div id="' + noteId + '-container" class="note-container">' +
               '<div id="' + noteId + '-remove-note" class="remove-note" value="' + folderID + '"> X </div>' +
               '<div id="' + noteId + '-copy-note" class="copy-note" value="' + note.id + '"> </div>' +
-              '<div id="' + noteId + '" class="note" value="' + note.id + '""> ' + note.title + '</div>' +
+              '<a id="' + noteId + '" class="note" href="/view/' + note.id + '""> ' + note.title + '</a>' +
             '</div>');
         $(document.getElementById(noteId + "-remove-note")).unbind();
         $(document.getElementById(noteId + "-remove-note")).click(clickRemoveNote);
