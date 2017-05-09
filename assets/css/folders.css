@@ -86,6 +86,15 @@
       width: 100%;
 }
 
+#prompt-input2 {
+  display: inline;
+  border: solid !important;
+  border-color: #808080 !important;
+  color: #808080 !important;
+  width: 200px !important;
+  height:30.25px !important;
+}
+
 #folder-window {
     width: 100%;
     padding:2rem;
@@ -178,6 +187,21 @@
   color: white !important;
 }
 
+.rename-folder {
+  display: inline;
+  float: right;
+  background-color: #ECF0F1;
+  color: #808080 !important;
+  border: solid;
+  border-color: #808080;
+}
+
+.rename-folder:hover {
+  background-color: #935d8c !important;
+  color: white !important;
+  border-color: white;
+}
+
 .remove-note {
     display: flex;
     float: right;
@@ -188,6 +212,16 @@
     width: 20px;
     height: 20px;
     cursor: pointer;
+}
+
+.copy-note {
+  float: right;
+  background-color: green;
+  border: solid 1px white;
+  color: white;
+  width: 3em;
+  text-align: center;
+  cursor: pointer;
 }
 
 .open-folder {

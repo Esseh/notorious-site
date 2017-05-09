@@ -220,6 +220,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 				b := BACKUP.Backup(content)
 				BACKUP.UpdateBackup(ctx, noteid, int64(ctx.User.IntID), &b)
 			}
+			NOTES.Notify(ctx, noteid)
 			if !ctx.ErrorPage("Internal Server Error (2)", err, http.StatusSeeOther) {
 				ctx.Redirect("/view/" + req.FormValue("notekey"))
 			}
