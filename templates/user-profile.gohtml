@@ -23,7 +23,6 @@
 		<!-- Wrapper -->
 		<div id="profile">
 			<div id="wrapper">
-				{{$num := .AvatarMod}}
 
 				<!-- Header -->
 					<header id="header" class="alt">
@@ -38,8 +37,8 @@
 							{{ if (eq .Data.IntID .User.IntID)}}
 							<label id="user-edit"><a href="/editprofile">Edit Profile</a></label>
 							{{ end }}
-							{{template "pencil" $num}}
 						</section>
+						<div id="bio-subscribe">
 						{{ if .Data.Bio }}
 						<section id="profile-bio-section">
 							<label id="bio-tag">Biography:</label>
@@ -49,6 +48,65 @@
 							</label>
 						</section>
 						{{ end }}
+						<section class="profile-section">
+							<label class="section-container">
+								<div id="dropdown">
+								  <button onclick="subFunction()" class="dropbtn">-Subscriptions-</button>
+								  <div id="subDropdown" class="dropdown-content">
+
+									{{$ctx := .HeaderData.Ctx}}
+									{{$u := .User}}
+								  {{range $i, $e := .SubNotes}}
+									{{if (canViewNote $e.Data $u)}}
+									{{$d := (getUser $ctx $e.Data.OwnerID)}}
+									{{$mod := (getMod $e.Data.OwnerID)}}
+									<label class="section-note">
+									<div>
+									<span class="icon">{{template "pencil" $mod}}</span>
+									<a class="note-name" href="/profile/{{$e.Data.OwnerID}}">{{$d.First}} {{$d.Last}}</a>
+								</div>
+									<span class="note-title">"{{$e.Content.Title}}"</span>
+								  <a class ="collabLink" href="/view/{{$e.ID}}">View</a>
+									{{ if (canEditNote $e.Data $u) }}
+									<a class ="collabLink" href="/edit/{{$e.ID}}">Edit</a>
+									{{end}}
+									</label>
+									{{end}}
+								  {{end}}
+								  </div>
+								</div>
+							</label>
+						</section>
+						<section class="profile-section">
+							<label class="section-container">
+								<div id="dropdown">
+								  <button onclick="createFunction()" class="dropbtn">-Created Notes-</button>
+								  <div id="createDropdown" class="dropdown-content">
+									{{$ctx := .HeaderData.Ctx}}
+									{{$u := .User}}
+								  {{range $i, $e := .AllNotes}}
+									{{if (canViewNote $e.Data $u)}}
+									{{$d := (getUser $ctx $e.Data.OwnerID)}}
+									{{$mod := (getMod $e.Data.OwnerID)}}
+									<label class="section-note">
+									<div>
+										<span class="icon">{{template "pencil" $mod}}</span>
+									<a class="note-name" href="/profile/{{$e.Data.OwnerID}}">{{$d.First}} {{$d.Last}}</a>
+								</div>
+									<span class="note-title">"{{$e.Content.Title}}"</span>
+								  <a class ="collabLink" href="/view/{{$e.ID}}">View</a>
+									{{ if (canEditNote $e.Data $u) }}
+									<a class ="collabLink" href="/edit/{{$e.ID}}">Edit</a>
+									{{end}}
+									</label>
+									{{end}}
+								  {{end}}
+								  </div>
+								</div>
+							</label>
+						</section>
+
+					</div>
 
 
 					</header>
@@ -56,7 +114,8 @@
 				<!-- Main -->
 
 				  <div id="folder-window">
-            <div id="{{.Root}}" class ="folder root" value="root"> Folders </div>
+            <div id="{{.Root}}" class ="folder root" value="root"> Folders: </div>
+						<div id="seperator"></div>
               <div id="{{.Root}}-menu" class="menu"></div>
               <div id="{{.Root}}-content" class="content">
               </div>
@@ -64,26 +123,6 @@
             <div id="error-box"></div>
           </div>
 
-					<div id="main">
-						{{ $d := .Data}}
-						{{ $u := .User}}
-						{{range $i, $e := .AllNotes}}
-						{{if (canViewNote $e.Data $u)}}
-							<div class="note-card">
-							<label id=note-box>
-							<a href="/view/{{$e.ID}}" class="icon fa-file-o"></a>
-							<span id="title">{{$e.Content.Title}}</span>
-							<div id="note-selections">
-							<a href="/view/{{$e.ID}}" class="note-select">View</a>
-							{{ if (canEditNote $e.Data $u) }}
-								<a href="/edit/{{$e.ID}}" class="note-select">Edit</a>
-							{{end}}
-							</div>
-							</label>
-							</div>
-						{{end}}
-						{{end}}
-					</div>
 
 			</div>
 		</div>
@@ -97,6 +136,48 @@
 			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
 			<script src="/public/assets/js/main.js"></script>
 			<script src="../assets/js/folders.js"></script>
+			<script>
+			/* When the user clicks on the button,
+			toggle between hiding and showing the dropdown content */
+			function subFunction() {
+			    document.getElementById("subDropdown").classList.toggle("show");
+			}
+
+			// Close the dropdown if the user clicks outside of it
+			window.onclick = function(event) {
+			  if (!event.target.matches('.dropbtn')) {
+
+			    var dropdowns = document.getElementsByClassName("dropdown-content");
+			    var i;
+			    for (i = 0; i < dropdowns.length; i++) {
+			      var openDropdown = dropdowns[i];
+			      if (openDropdown.classList.contains('show')) {
+			        openDropdown.classList.remove('show');
+			      }
+			    }
+			  }
+			}
+
+			function createFunction() {
+			    document.getElementById("createDropdown").classList.toggle("show");
+			}
+
+			// Close the dropdown if the user clicks outside of it
+			window.onclick = function(event) {
+			  if (!event.target.matches('.dropbtn')) {
+
+			    var dropdowns = document.getElementsByClassName("dropdown-content");
+			    var i;
+			    for (i = 0; i < dropdowns.length; i++) {
+			      var openDropdown = dropdowns[i];
+			      if (openDropdown.classList.contains('show')) {
+			        openDropdown.classList.remove('show');
+			      }
+			    }
+			  }
+			}
+
+		</script>
 
 	</body>
 	{{end}}

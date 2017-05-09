@@ -34,6 +34,12 @@ func INIT_NOTES_HANDLERS(r *httprouter.Router) {
 	r.POST("/note/api/copynote", func(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 		fmt.Fprint(res, NOTES.API_SaveCopy(CONTEXT.NewContext(res, req)))
 	})
+	r.POST("/note/api/subscribe", func(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+		fmt.Fprint(res, NOTES.SubscribeAPI(CONTEXT.NewContext(res, req)))
+	})
+	r.POST("/note/api/unsubscribe", func(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+		fmt.Fprint(res, NOTES.UnsubscribeAPI(CONTEXT.NewContext(res, req)))
+	})
 }
 
 func NOTES_GET_Backups(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
@@ -113,12 +119,24 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					ctx.Redirect("/")
 				}
 				NoteBody := template.HTML(CORE.EscapeString(ViewContent.Content))
+
+				isSubscribed := false
+				subscriptions := NOTES.Subscription{}
+				retrievable.GetEntity(ctx, int64(ctx.User.IntID), &subscriptions)
+				noteID, _ := strconv.ParseInt(params.ByName("ID"), 10, 64)
+				for _, v := range subscriptions.NoteIDS {
+					if v == noteID {
+						isSubscribed = true
+						break
+					}
+				}
 				CORE.ServeTemplateWithParams(res, "viewNote", struct {
 					HeaderData                                 CONTEXT.HeaderData
 					ErrorResponse, RedirectURL, Title, Notekey string
 					Content                                    template.HTML
 					User, Owner                                *USERS.User
 					NoteData                                   *NOTES.Note
+					Subscribed                                 bool
 				}{
 					HeaderData:    *MakeHeader(ctx),
 					RedirectURL:   req.FormValue("redirect"),
@@ -129,6 +147,7 @@ func NOTES_GET_View(res http.ResponseWriter, req *http.Request, params httproute
 					User:          ctx.User,
 					Owner:         owner,
 					NoteData:      ViewNote,
+					Subscribed:    isSubscribed,
 				})
 			}
 		}
