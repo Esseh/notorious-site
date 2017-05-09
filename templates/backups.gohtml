@@ -67,7 +67,7 @@ document.getElementById("return").setAttribute("href", "/view" + window.location
 <!-- Initialize Quill editor -->
 <script>
 
-document.getElementById("clickMe").onclick = function () { post('/document',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML}); };
+/*document.getElementById("clickMe").onclick = function () { post('/document',{title: document.getElementById("title").value ,note: editor.container.firstChild.innerHTML}); };
 
 
 
@@ -139,7 +139,7 @@ var toolbarOptions = [
 //     return 'There are unsaved changes. Are you sure you want to leave?';
 //   }
 
-function post(path, params, method) {
+/*function post(path, params, method) {
     method = "post";
 
     var form = document.createElement("form");
@@ -160,7 +160,7 @@ function post(path, params, method) {
     document.body.appendChild(form);
     form.submit();
 }
-
+*/
 
 </script>
 {{end}}

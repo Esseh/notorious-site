@@ -211,7 +211,7 @@ func NOTES_POST_Editor(res http.ResponseWriter, req *http.Request, params httpro
 			retrievable.GetEntity(ctx, noteid, &n)
 			isCollaborator := false
 			for _, v := range n.Collaborators {
-				if int64(ctx.User.IntID) == n.OwnerID || int64(ctx.User.IntID) == v {
+				if (int64(ctx.User.IntID) == n.OwnerID) || (int64(ctx.User.IntID) == v) {
 					isCollaborator = true
 					break
 				}
