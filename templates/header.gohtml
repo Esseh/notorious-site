@@ -4,22 +4,22 @@
 
 <nav id="nav">
   <ul>
-    <li id="first" style="width: 200px">
+    <li id="first">
       <a href="/new/"><span class="icon fa-copy"></span><span class="desktop">Create Notes</span></a>
     </li>
-    <li id="home-link" style="width: 40px">
+    <li id="home-link">
       <a href="/">{{ template "menu-logo" .}}</a>
     </li>
       {{if .User.Email}}
       {{$userID := toInt .User.IntID}}
       {{ $notifications := getNotifications .Ctx $userID }}
 
+      {{ if $notifications.NotificationsPending }}
       <div class="dropdowntop">
-          {{ if $notifications.NotificationsPending }}
-        <button onclick="openDrop()" id="newbutton" class="dropbutton"> New Notifications! </button>
-          {{ else }}
-        <button class="dropbutton" style="background-color: gray"> No New Notifications </button>
-          {{ end }}
+        <button onclick="openDrop()" id="newbutton" class="dropbutton">
+          {{$mod := (getMod (toInt .User.IntID))}}
+          <span id="profile-logo">{{template "pencil" $mod}}{{template "notify"}}</span>
+        </button>
         </button>
 
         <div id="dropeddown" class="dropdown-contenttop">
@@ -29,6 +29,7 @@
           <button onclick="clearNotif()" class="clearbtn"> Clear Notifications</button>
         </div>
       </div>
+      {{ end }}
 
       <li id="second">
         <dropdown>

@@ -86,6 +86,10 @@
       width: 100%;
 }
 
+.remove-note:hover {
+    background-color: #8171ad;
+}
+
 #prompt-input2 {
   display: inline;
   border: solid !important;
@@ -115,8 +119,19 @@
 }
 
 .note {
-    margin: 20px;
+    position: relative;
+    display: flex;
     font-size: 15px;
+    padding: 20px;
+    left: 25px;
+    top: 50px;
+    border-bottom: solid 1px;
+    border-top: solid 1px;
+}
+
+.note:hover {
+    color: #8171ad;
+    border-bottom-color: #8171ad;
 }
 
 .add-folder {
